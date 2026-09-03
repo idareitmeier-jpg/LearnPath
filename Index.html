@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LearnPath</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #1e293b;
+    }
+
+    header {
+      background: #4f46e5;
+      color: white;
+      padding: 18px;
+      text-align: center;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: white;
+      padding: 10px;
+    }
+
+    nav button {
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #e2e8f0;
+      font-size: 15px;
+    }
+
+    nav button.active {
+      background: #4f46e5;
+      color: white;
+    }
+
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 18px;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .card {
+      background: white;
+      padding: 18px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      margin-bottom: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    .danger {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+
+    .flashcard {
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 30px;
+      font-size: 24px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border-radius: 20px;
+      margin: 20px 0;
+    }
+
+    .hidden { display: none; }
+
+    .small {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .plan-item {
+      padding: 12px;
+      border-left: 5px solid #4f46e5;
+      background: #f8fafc;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>📚 LearnPath</h1>
+  <p>Dein persönlicher Lernbegleiter</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showPage('overview', this)">Übersicht</button>
+  <button onclick="showPage('plan', this)">Lernplan</button>
+  <button onclick="showPage('cards', this)">Karteikarten</button>
+  <button onclick="showPage('profile', this)">Profil</button>
+</nav>
+
+<main>
+
+  <!-- ÜBERSICHT -->
+  <section id="overview" class="page active">
+
+    <div class="card">
+      <h2>Willkommen bei LearnPath 👋</h2>
+      <p id="welcomeText">
+        Erstelle zuerst dein Profil und deinen persönlichen Lernplan.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Dein Fortschritt</h3>
+      <p id="cardCount">Karteikarten: 0</p>
+      <p id="examInfo">Noch kein Prüfungstermin festgelegt.</p>
+    </div>
+
+  </section>
+
+  <!-- LERNPLAN -->
+  <section id="plan" class="page">
+
+    <div class="card">
+      <h2>🗓️ Persönlichen Lernplan erstellen</h2>
+
+      <label>Fach</label>
+      <input id="subject" placeholder="z. B. Mathematik">
+
+      <label>Prüfungsdatum</label>
+      <input id="examDate" type="date">
+
+      <label>Deine Wunschnote</label>
+      <select id="goalGrade">
+        <option value="1">Note 1</option>
+        <option value="2">Note 2</option>
+        <option value="3">Note 3</option>
+        <option value="4">Note 4</option>
+        <option value="5">Note 5</option>
+        <option value="6">Note 6</option>
+      </select>
+
+      <label>Wie viele Minuten möchtest du ungefähr pro Tag lernen?</label>
+      <input id="minutes" type="number" value="30">
+
+      <button class="primary" onclick="createPlan()">
+        Lernplan erstellen
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>Dein Lernplan</h2>
+      <div id="planOutput">
+        <p class="small">Noch kein Lernplan erstellt.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- KARTEIKARTEN -->
+  <section id="cards" class="page">
+
+    <div class="card">
+      <h2>➕ Neue Karteikarte</h2>
+
+      <label>Frage / Vorderseite</label>
+      <textarea id="question" placeholder="z. B. Was ist die Hauptstadt von Deutschland?"></textarea>
+
+      <label>Antwort / Rückseite</label>
+      <textarea id="answer" placeholder="z. B. Berlin"></textarea>
+
+      <button class="primary" onclick="addCard()">
+        Karteikarte speichern
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>🧠 Lernen</h2>
+
+      <div id="flashcard" class="flashcard">
+        Noch keine Karteikarte vorhanden.
+      </div>
+
+      <button class="primary" onclick="flipCard()">
+        Karte umdrehen
+      </button>
+
+      <button class="primary" onclick="nextCard()">
+        Nächste Karte
+      </button>
+
+      <p id="learningInfo" class="small"></p>
+    </div>
+
+    <div class="card">
+      <h2>Meine Karteikarten</h2>
+      <div id="cardList"></div>
+    </div>
+
+  </section>
+
+  <!-- PROFIL -->
+  <section id="profile" class="page">
+
+    <div class="card">
+      <h2>👤 Mein Profil</h2>
+
+      <label>Name</label>
+      <input id="userName" placeholder="Dein Name">
+
+      <label>Schulart</label>
+      <select id="schoolType">
+        <option>Gymnasium</option>
+        <option>Realschule</option>
+        <option>Mittelschule</option>
+        <option>Gesamtschule</option>
+        <option>Andere</option>
+      </select>
+
+      <label>Jahrgangsstufe</label>
+      <select id="gradeLevel">
+        <option>5</option>
+        <option>6</option>
+        <option>7</option>
+        <option>8</option>
+        <option>9</option>
+        <option>10</option>
+        <option>11</option>
+        <option>12</option>
+        <option>13</option>
+      </select>
+
+      <button class="primary" onclick="saveProfile()">
+        Profil speichern
+      </button>
+
+      <p id="profileStatus"></p>
+    </div>
+
+    <div class="card">
+      <h2>☁️ Cloud-Speicherung</h2>
+
+      <p class="small">
+        Die Supabase-Verbindung kann später hier aktiviert werden.
+      </p>
+
+      <p id="cloudStatus">
+        Cloud noch nicht verbunden.
+      </p>
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+
+/* =========================================
+   SUPABASE EINSTELLUNGEN
+
+   HIER später deine beiden Werte 22
+const SUPABASE_URL = "<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LearnPath</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #1e293b;
+    }
+
+    header {
+      background: #4f46e5;
+      color: white;
+      padding: 18px;
+      text-align: center;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: white;
+      padding: 10px;
+    }
+
+    nav button {
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #e2e8f0;
+      font-size: 15px;
+    }
+
+    nav button.active {
+      background: #4f46e5;
+      color: white;
+    }
+
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 18px;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .card {
+      background: white;
+      padding: 18px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      margin-bottom: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    .danger {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+
+    .flashcard {
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 30px;
+      font-size: 24px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border-radius: 20px;
+      margin: 20px 0;
+    }
+
+    .hidden { display: none; }
+
+    .small {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .plan-item {
+      padding: 12px;
+      border-left: 5px solid #4f46e5;
+      background: #f8fafc;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>📚 LearnPath</h1>
+  <p>Dein persönlicher Lernbegleiter</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showPage('overview', this)">Übersicht</button>
+  <button onclick="showPage('plan', this)">Lernplan</button>
+  <button onclick="showPage('cards', this)">Karteikarten</button>
+  <button onclick="showPage('profile', this)">Profil</button>
+</nav>
+
+<main>
+
+  <!-- ÜBERSICHT -->
+  <section id="overview" class="page active">
+
+    <div class="card">
+      <h2>Willkommen bei LearnPath 👋</h2>
+      <p id="welcomeText">
+        Erstelle zuerst dein Profil und deinen persönlichen Lernplan.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Dein Fortschritt</h3>
+      <p id="cardCount">Karteikarten: 0</p>
+      <p id="examInfo">Noch kein Prüfungstermin festgelegt.</p>
+    </div>
+
+  </section>
+
+  <!-- LERNPLAN -->
+  <section id="plan" class="page">
+
+    <div class="card">
+      <h2>🗓️ Persönlichen Lernplan erstellen</h2>
+
+      <label>Fach</label>
+      <input id="subject" placeholder="z. B. Mathematik">
+
+      <label>Prüfungsdatum</label>
+      <input id="examDate" type="date">
+
+      <label>Deine Wunschnote</label>
+      <select id="goalGrade">
+        <option value="1">Note 1</option>
+        <option value="2">Note 2</option>
+        <option value="3">Note 3</option>
+        <option value="4">Note 4</option>
+        <option value="5">Note 5</option>
+        <option value="6">Note 6</option>
+      </select>
+
+      <label>Wie viele Minuten möchtest du ungefähr pro Tag lernen?</label>
+      <input id="minutes" type="number" value="30">
+
+      <button class="primary" onclick="createPlan()">
+        Lernplan erstellen
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>Dein Lernplan</h2>
+      <div id="planOutput">
+        <p class="small">Noch kein Lernplan erstellt.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- KARTEIKARTEN -->
+  <section id="cards" class="page">
+
+    <div class="card">
+      <h2>➕ Neue Karteikarte</h2>
+
+      <label>Frage / Vorderseite</label>
+      <textarea id="question" placeholder="z. B. Was ist die Hauptstadt von Deutschland?"></textarea>
+
+      <label>Antwort / Rückseite</label>
+      <textarea id="answer" placeholder="z. B. Berlin"></textarea>
+
+      <button class="primary" onclick="addCard()">
+        Karteikarte speichern
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>🧠 Lernen</h2>
+
+      <div id="flashcard" class="flashcard">
+        Noch keine Karteikarte vorhanden.
+      </div>
+
+      <button class="primary" onclick="flipCard()">
+        Karte umdrehen
+      </button>
+
+      <button class="primary" onclick="nextCard()">
+        Nächste Karte
+      </button>
+
+      <p id="learningInfo" class="small"></p>
+    </div>
+
+    <div class="card">
+      <h2>Meine Karteikarten</h2>
+      <div id="cardList"></div>
+    </div>
+
+  </section>
+
+  <!-- PROFIL -->
+  <section id="profile" class="page">
+
+    <div class="card">
+      <h2>👤 Mein Profil</h2>
+
+      <label>Name</label>
+      <input id="userName" placeholder="Dein Name">
+
+      <label>Schulart</label>
+      <select id="schoolType">
+        <option>Gymnasium</option>
+        <option>Realschule</option>
+        <option>Mittelschule</option>
+        <option>Gesamtschule</option>
+        <option>Andere</option>
+      </select>
+
+      <label>Jahrgangsstufe</label>
+      <select id="gradeLevel">
+        <option>5</option>
+        <option>6</option>
+        <option>7</option>
+        <option>8</option>
+        <option>9</option>
+        <option>10</option>
+        <option>11</option>
+        <option>12</option>
+        <option>13</option>
+      </select>
+
+      <button class="primary" onclick="saveProfile()">
+        Profil speichern
+      </button>
+
+      <p id="profileStatus"></p>
+    </div>
+
+    <div class="card">
+      <h2>☁️ Cloud-Speicherung</h2>
+
+      <p class="small">
+        Die Supabase-Verbindung kann später hier aktiviert werden.
+      </p>
+
+      <p id="cloudStatus">
+        Cloud noch nicht verbunden.
+      </p>
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+
+/* =========================================
+   SUPABASE EINSTELLUNGEN
+
+   HIER später deine beiden Werte einsetzen
+========================================= */
+
+const SUPABASE_URL = "HIER_DEINE_API_URL_EINFUEGEN";
+
+const SUPABASE_KEY = "HIER_DEINEN_PUBLISHABLE_KEY_EINFUEGEN";
+
+
+/* =========================================
+   APP DATEN
+========================================= */
+
+let cards = JSON.parse(localStorage.getItem("learnpathCards")) || [];
+let profile = JSON.parse(localStorage.getItem("learnpathProfile")) || {};
+let currentCard = 0;
+let showingAnswer = false;
+
+
+/* =========================================
+   SEITEN
+========================================= */
+
+function showPage(pageId, button) {
+
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.remove("active");
+  });
+
+  document.getElementById(pageId).classList.add("active");
+
+  document.querySelectorAll("nav button").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  button.classList.add("active");
+}
+
+
+/* =========================================
+   PROFIL
+========================================= */
+
+function saveProfile() {
+
+  profile = {
+    name: document.getElementById("userName").value,
+    schoolType: document.getElementById("schoolType").value,
+    gradeLevel: document.getElementById("gradeLevel").value
+  };
+
+  localStorage.setItem(
+    "learnpathProfile",
+    JSON.stringify(profile)
+  );
+
+  document.getElementById("profileStatus").innerText =
+    "✅ Profil gespeichert!";
+
+  updateOverview();
+}
+
+
+function loadProfile() {
+
+  if (profile.name) {
+
+    document.getElementById("userName").value = profile.name;
+
+    document.getElementById("schoolType").value =
+      profile.schoolType;
+
+    document.getElementById("gradeLevel").value =
+      profile.gradeLevel;
+  }
+}
+
+
+/* =========================================
+   LERNPLAN
+========================================= */
+
+function createPlan() {
+
+  const subject =
+    document.getElementById("subject").value;
+
+  const examDate =
+    document.getElementById("examDate").value;
+
+  const goal =
+    document.getElementById("goalGrade").value;
+
+  const minutes =
+    document.getElementById("minutes").value;
+
+  if (!subject || !examDate) {
+
+    alert("Bitte Fach und Prüfungsdatum eingeben.");
+
+    return;
+  }
+
+  const today = new Date();
+  const exam = new Date(examDate);
+
+  const difference =
+    exam - today;
+
+  const days =
+    Math.ceil(
+      difference / (1000 * 60 * 60 * 24)
+    );
+
+  if (days < 1) {
+
+    alert("Bitte wähle ein zukünftiges Prüfungsdatum.");
+
+    return;
+  }
+
+  const intensity =
+    goal <= 2
+      ? "Intensives Lernen"
+      : "Regelmäßiges Lernen";
+
+  const planHTML = `
+    <div class="plan-item">
+      <strong>📚 Fach:</strong> ${subject}
+    </div>
+
+    <div class="plan-item">
+      <strong>🎯 Wunschnote:</strong> ${goal}
+    </div>
+
+    <div class="plan-item">
+      <strong>📅 Tage bis zur Prüfung:</strong> ${days}
+    </div>
+
+    <div class="plan-item">
+      <strong>⏱️ Tägliche Lernzeit:</strong> ${minutes} Minuten
+    </div>
+
+    <div class="plan-item">
+      <strong>🔥 Empfehlung:</strong> ${intensity}
+    </div>
+
+    <div class="plan-item">
+      Heute: Wiederhole Karteikarten und lerne ein neues Thema.
+    </div>
+  `;
+
+  document.getElementById("planOutput").innerHTML =
+    planHTML;
+
+  localStorage.setItem(
+    "learnpathExam",
+    JSON.stringify({
+      subject,
+      examDate,
+      goal,
+      minutes,
+      days
+    })
+  );
+
+  updateOverview();
+}
+
+
+/* =========================================
+   KARTEIKARTEN
+========================================= */
+
+function addCard() {
+
+  const question =
+    document.getElementById("question").value.trim();
+
+  const answer =
+    document.getElementById("answer").value.trim();
+
+  if (!question || !answer) {
+
+    alert("Bitte Frage und Antwort eingeben.");
+
+    return;
+  }
+
+  cards.push({
+    question: question,
+    answer: answer
+  });
+
+  localStorage.setItem(
+    "learnpathCards",
+    JSON.stringify(cards)
+  );
+
+  document.getElementById("question").value = "";
+  document.getElementById("answer").value = "";
+
+  currentCard = cards.length - 1;
+  showingAnswer = false;
+
+  renderCard();
+  renderCardList();
+  updateOverview();
+}
+
+
+function renderCard() {
+
+  const flashcard =
+    document.getElementById("flashcard");
+
+  if (cards.length === 0) {
+
+    flashcard.innerText =
+      "Noch keine Karteikarte vorhanden.";
+
+    return;
+  }
+
+  const card = cards[currentCard];
+
+  flashcard.innerText =
+    showingAnswer
+      ? card.answer
+      : card.question;
+
+  document.getElementById("learningInfo").innerText =
+    `Karte ${currentCard + 1} von ${cards.length}`;
+}
+
+
+function flipCard() {
+
+  if (cards.length === 0) return;
+
+  showingAnswer = !showingAnswer;
+
+  renderCard();
+}
+
+
+function nextCard() {
+
+  if (cards.length === 0) return;
+
+  currentCard =
+    (currentCard + 1) % cards.length;
+
+  showingAnswer = false;
+
+  renderCard();
+}
+
+
+function deleteCard(index) {
+
+  cards.splice(index, 1);
+
+  localStorage.setItem(
+    "learnpathCards",
+    JSON.stringify(cards)
+  );
+
+  currentCard = 0;
+  showingAnswer = false;
+
+  renderCard();
+  renderCardList();
+  updateOverview();
+}
+
+
+function renderCardList() {
+
+  const list =
+    document.getElementById("cardList");
+
+  list.innerHTML = "";
+
+  cards.forEach((card, index) => {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "plan-item";
+
+    div.innerHTML = `
+      <strong>${card.question}</strong>
+      <br>
+      <span class="small">${card.answer}</span>
+      <br><br>
+      <button class="danger"
+        onclick="deleteCard(${index})">
+        Löschen
+      </button>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+
+/* =========================================
+   ÜBERSICHT
+========================================= */
+
+function updateOverview() {
+
+  document.getElementById("cardCount").innerText =
+    `Karteikarten: ${cards.length}`;
+
+  if (profile.name) {
+
+    document.getElementById("welcomeText").innerText =
+      `Willkommen zurück, ${profile.name}! Du bist in der ${profile.gradeLevel}. Klasse.`;
+  }
+
+  const exam =
+    JSON.parse(
+      localStorage.getItem("learnpathExam")
+    );
+
+  if (exam) {
+
+    document.getElementById("examInfo").innerText =
+      `Prüfung: ${exam.subject} – noch ${exam.days} Tage`;
+  }
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+loadProfile();
+renderCard();
+renderCardList();
+updateOverview();
+
+</script>
+
+</body>
+</html>^";
+
+const SUPABASE_KEY = "sb_publishable_KzA3gdL3LeerPPhyUQJaPw_z3S450VG";
+
+
+/* =========================================
+   APP DATEN
+========================================= */
+
+let cards = JSON.parse(localStorage.getItem("learnpathCards")) || [];
+let profile = JSON.parse(localStorage.getItem("learnpathProfile")) || {};
+let currentCard = 0;
+let showingAnswer = false;
+
+
+/* =========================================
+   SEITEN
+========================================= */
+
+function showPage(pageId, button) {
+
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.remove("active");
+  });
+
+  document.getElementById(pageId).classList.add("active");
+
+  document.querySelectorAll("nav button").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  button.classList.add("active");
+}
+
+
+/* =========================================
+   PROFIL
+========================================= */
+
+function saveProfile() {
+
+  profile = {
+    name: document.getElementById("userName").value,
+    schoolType: document.getElementById("schoolType").value,
+    gradeLevel: document.getElementById("gradeLevel").value
+  };
+
+  localStorage.setItem(
+    "learnpathProfile",
+    JSON.stringify(profile)
+  );
+
+  document.getElementById("profileStatus").innerText =
+    "✅ Profil gespeichert!";
+
+  updateOverview();
+}
+
+
+function loadProfile() {
+
+  if (profile.name) {
+
+    document.getElementById("userName").value = profile.name;
+
+    document.getElementById("schoolType").value =
+      profile.schoolType;
+
+    document.getElementById("gradeLevel").value =
+      profile.gradeLevel;
+  }
+}
+
+
+/* =========================================
+   LERNPLAN
+========================================= */
+
+function createPlan() {
+
+  const subject =
+    document.getElementById("subject").value;
+
+  const examDate =
+    document.getElementById("examDate").value;
+
+  const goal =
+    document.getElementById("goalGrade").value;
+
+  const minutes =
+    document.getElementById("minutes").value;
+
+  if (!subject || !examDate) {
+
+    alert("Bitte Fach und Prüfungsdatum eingeben.");
+
+    return;
+  }
+
+  const today = new Date();
+  const exam = new Date(examDate);
+
+  const difference =
+    exam - today;
+
+  const days =
+    Math.ceil(
+      difference / (1000 * 60 * 60 * 24)
+    );
+
+  if (days < 1) {
+
+    alert("Bitte wähle ein zukünftiges Prüfungsdatum.");
+
+    return;
+  }
+
+  const intensity =
+    goal <= 2
+      ? "Intensives Lernen"
+      : "Regelmäßiges Lernen";
+
+  const planHTML = `
+    <div class="plan-item">
+      <strong>📚 Fach:</strong> ${subject}
+    </div>
+
+    <div class="plan-item">
+      <strong>🎯 Wunschnote:</strong> ${goal}
+    </div>
+
+    <div class="plan-item">
+      <strong>📅 Tage bis zur Prüfung:</strong> ${days}
+    </div>
+
+    <div class="plan-item">
+      <strong>⏱️ Tägliche Lernzeit:</strong> ${minutes} Minuten
+    </div>
+
+    <div class="plan-item">
+      <strong>🔥 Empfehlung:</strong> ${intensity}
+    </div>
+
+    <div class="plan-item">
+      Heute: Wiederhole Karteikarten und lerne ein neues Thema.
+    </div>
+  `;
+
+  document.getElementById("planOutput").innerHTML =
+    planHTML;
+
+  localStorage.setItem(
+    "learnpathExam",
+    JSON.stringify({
+      subject,
+      examDate,
+      goal,
+      minutes,
+      days
+    })
+  );
+
+  updateOverview();
+}
+
+
+/* =========================================
+   KARTEIKARTEN
+========================================= */
+
+function addCard() {
+
+  const question =
+    document.getElementById("question").value.trim();
+
+  const answer =
+    document.getElementById("answer").value.trim();
+
+  if (!question || !answer) {
+
+    alert("Bitte Frage und Antwort eingeben.");
+
+    return;
+  }
+
+  cards.push({
+    question: question,
+    answer: answer
+  });
+
+  localStorage.setItem(
+    "learnpathCards",
+    JSON.stringify(cards)
+  );
+
+  document.getElementById("question").value = "";
+  document.getElementById("answer").value = "";
+
+  currentCard = cards.length - 1;
+  showingAnswer = false;
+
+  renderCard();
+  renderCardList();
+  updateOverview();
+}
+
+
+function renderCard() {
+
+  const flashcard =
+    document.getElementById("flashcard");
+
+  if (cards.length === 0) {
+
+    flashcard.innerText =
+      "Noch keine Karteikarte vorhanden.";
+
+    return;
+  }
+
+  const card = cards[currentCard];
+
+  flashcard.innerText =
+    showingAnswer
+      ? card.answer
+      : card.question;
+
+  document.getElementById("learningInfo").innerText =
+    `Karte ${currentCard + 1} von ${cards.length}`;
+}
+
+
+function flipCard() {
+
+  if (cards.length === 0) return;
+
+  showingAnswer = !showingAnswer;
+
+  renderCard();
+}
+
+
+function nextCard() {
+
+  if (cards.length === 0) return;
+
+  currentCard =
+    (currentCard + 1) % cards.length;
+
+  showingAnswer = false;
+
+  renderCard();
+}
+
+
+function deleteCard(index) {
+
+  cards.splice(index, 1);
+
+  localStorage.setItem(
+    "learnpathCards",
+    JSON.stringify(cards)
+  );
+
+  currentCard = 0;
+  showingAnswer = false;
+
+  renderCard();
+  renderCardList();
+  updateOverview();
+}
+
+
+function renderCardList() {
+
+  const list =
+    document.getElementById("cardList");
+
+  list.innerHTML = "";
+
+  cards.forEach((card, index) => {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "plan-item";
+
+    div.innerHTML = `
+      <strong>${card.question}</strong>
+      <br>
+      <span class="small">${card.answer}</span>
+      <br><br>
+      <button class="danger"
+        onclick="deleteCard(${index})">
+        Löschen
+      </button>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+
+/* =========================================
+   ÜBERSICHT
+========================================= */
+
+function updateOverview() {
+
+  document.getElementById("cardCount").innerText =
+    `Karteikarten: ${cards.length}`;
+
+  if (profile.name) {
+
+    document.getElementById("welcomeText").innerText =
+      `Willkommen zurück, ${profile.name}! Du bist in der ${profile.gradeLevel}. Klasse.`;
+  }
+
+  const exam =
+    JSON.parse(
+      localStorage.getItem("learnpathExam")
+    );
+
+  if (exam) {
+
+    document.getElementById("examInfo").innerText =
+      `Prüfung: ${exam.subject} – noch ${exam.days} Tage`;
+  }
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+loadProfile();
+renderCard();
+renderCardList();
+updateOverview();
+
+</script>
+
+</body>
+</html>
