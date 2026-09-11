@@ -168,7 +168,8 @@
 
   <!-- LERNPLAN -->
   <section id="plan" class="page">
-
+<h2>📚 Meine Lernpläne</h2>
+    <div id="planList"></div>
     <div class="card">
       <h2>📝 Lernplan erstellen</h2>
 
@@ -390,10 +391,9 @@
     };
 
 
-    localStorage.setItem(
-      "learnpathPlan",
-      JSON.stringify(plan)
-    );
+    let plans = JSON.parse(localStorage.getItem("learnpathPlans")) || [];
+plans.push(plan);
+localStorage.setItem("learnpathPlans", JSON.stringify(plans));
 
 
     document.getElementById("planResult").innerHTML = `
@@ -426,8 +426,8 @@
 
   function updateOverview() {
 
-    const plan =
-      JSON.parse(localStorage.getItem("learnpathPlan"));
+    const plans = JSON.parse(localStorage.getItem("learnpathPlans")) || [];
+const plan = plans[plans.length - 1];
 
 
     if (!plan) return;
@@ -455,6 +455,24 @@
      KARTEIKARTEN
      ===================================================== */
 
+  function renderPlans() {
+  const plans = JSON.parse(localStorage.getItem("learnpathPlans")) || [];
+  const planList = document.getElementById("planList");
+
+  planList.innerHTML = "";
+
+  plans.forEach((plan, index) => {
+    planList.innerHTML += `
+      <div class="plan">
+        <h3>📚 Lernplan ${index + 1}</h3>
+        <p><strong>Fach:</strong> ${plan.subject}</p>
+        <p><strong>Prüfung:</strong> ${plan.examDate}</p>
+        <p><strong>Wunschnote:</strong> ${plan.goal}</p>
+        <p><strong>Lernzeit:</strong> ${plan.minutes} Minuten täglich</p>
+      </div>
+    `;
+  });
+}
   function addCard() {
 
     const question =
@@ -543,7 +561,7 @@
 
   renderCards();
   
-  
+  renderPlans();
 
 </script>
 
