@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -1690,96 +1691,42 @@
    * =========================
    */
 
-  async function generateAICards(
-    lerntext,
-    files = []
-  ) {
+  async function generateAICards(lerntext, files = []) {
 
-    const response =
-      await fetch(
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
-        SUPABASE_URL +
-        "/functions/v1/genarere-flashcards",
-
-        {
-
-          method:
-            "POST",
-
-          headers: {
-
-            "Content-Type":
-              "application/json",
-
-            "apikey":
-              SUPABASE_KEY
-
-          },
-
-          body:
-            JSON.stringify({
-
-              lerntext:
-                lerntext,
-
-              files:
-                files
-
-            })
-
+  const { data, error } =
+    await supabaseClient.functions.invoke(
+      "genarere-flashcards",
+      {
+        body: {
+          lerntext: lerntext,
+          files: files
         }
+      }
+    );
 
-      );
-
-
-    let result;
-
-
-    try {
-
-      result =
-        await response.json();
-
-    }
-    catch {
-
-      throw new Error(
-        "Die KI-Funktion hat keine gültige Antwort geliefert."
-      );
-
-    }
-
-
-    if (
-      !response.ok
-    ) {
-
-      throw new Error(
-
-        result?.error ||
-        "Die KI-Funktion hat einen Fehler zurückgegeben."
-
-      );
-
-    }
-
-
-    if (
-      !Array.isArray(
-        result.cards
-      )
-    ) {
-
-      throw new Error(
-        "Die KI hat kein gültiges Karteikarten-Format zurückgegeben."
-      );
-
-    }
-
-
-    return result.cards;
-
+  if (error) {
+    throw new Error(
+      error.message ||
+      "Die KI-Funktion konnte nicht aufgerufen werden."
+    );
   }
+
+  if (
+    !data ||
+    !Array.isArray(data.cards)
+  ) {
+    throw new Error(
+      "Die KI hat kein gültiges Karteikarten-Format zurückgegeben."
+    );
+  }
+
+  return data.cards;
+}
 
 
   function updatePlanMaterialCount(planId) {
