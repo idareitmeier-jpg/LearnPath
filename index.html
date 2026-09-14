@@ -6,6 +6,9 @@
 
   <title>LearnPath</title>
 
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -288,18 +291,13 @@
 
     <div class="card welcome-box">
       <h2>👋 Willkommen bei LearnPath!</h2>
-      <p>
-        Dein persönlicher Lernbegleiter für Prüfungen.
-      </p>
+      <p>Dein persönlicher Lernbegleiter für Prüfungen.</p>
     </div>
 
     <div class="card">
       <h2>📅 Dein heutiger Lernplan</h2>
-
       <div id="todayPlan">
-        <p class="empty">
-          Erstelle zuerst einen Lernplan.
-        </p>
+        <p class="empty">Erstelle zuerst einen Lernplan.</p>
       </div>
     </div>
 
@@ -338,13 +336,9 @@
   <section id="plans" class="page">
 
     <div class="card">
-
       <h2>📚 Meine Lernpläne</h2>
-
       <div id="planList"></div>
-
     </div>
-
 
     <div class="card">
 
@@ -358,7 +352,6 @@
         placeholder="z. B. Mathematik"
       >
 
-
       <label>Prüfungsdatum</label>
 
       <input
@@ -366,24 +359,17 @@
         type="date"
       >
 
-
       <label>Wunschnote</label>
 
       <select id="goalGrade">
-
         <option value="">Bitte auswählen</option>
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
         <option value="4">4</option>
-
       </select>
 
-
-      <button
-        class="primary"
-        onclick="createPlan()"
-      >
+      <button class="primary" onclick="createPlan()">
         Lernplan erstellen
       </button>
 
@@ -411,17 +397,16 @@
 
         <p>
           Lade Text, Fotos oder PDFs hoch.
-          LearnPath kann daraus automatisch
-          Karteikarten erstellen.
+          LearnPath kann daraus automatisch Karteikarten erstellen.
         </p>
 
       </div>
 
-
-      <label>Zu welchem Lernplan gehört das Material?</label>
+      <label>
+        Zu welchem Lernplan gehört das Material?
+      </label>
 
       <select id="materialPlan"></select>
-
 
       <label>Material auswählen</label>
 
@@ -432,39 +417,26 @@
         multiple
       >
 
-      <p
-        id="selectedFiles"
-        class="small"
-      ></p>
+      <p id="selectedFiles" class="small"></p>
 
-
-      <label>Oder Text aus deinem Lernzettel einfügen</label>
+      <label>
+        Oder Text aus deinem Lernzettel einfügen
+      </label>
 
       <textarea
         id="materialText"
         placeholder="Hier kannst du deinen Lernstoff einfügen..."
       ></textarea>
 
-
-      <button
-        class="primary"
-        onclick="saveMaterial()"
-      >
+      <button class="primary" onclick="saveMaterial()">
         Lernmaterial speichern
       </button>
 
-      <button
-        class="secondary"
-        onclick="createCardsFromMaterial()"
-      >
+      <button class="secondary" onclick="createCardsFromMaterial()">
         🤖 Karteikarten mit KI erstellen
       </button>
 
-
-      <p
-        id="materialStatus"
-        class="success"
-      ></p>
+      <p id="materialStatus" class="success"></p>
 
     </div>
 
@@ -525,10 +497,7 @@
         placeholder="Die Antwort"
       >
 
-      <button
-        class="primary"
-        onclick="addCard()"
-      >
+      <button class="primary" onclick="addCard()">
         Karte speichern
       </button>
 
@@ -552,7 +521,6 @@
           aus deinem Lernstoff erstellen.
         </p>
 
-
         <label>Prüfungsdauer</label>
 
         <select id="testDuration">
@@ -566,11 +534,7 @@
 
         </select>
 
-
-        <button
-          class="primary"
-          onclick="startTest()"
-        >
+        <button class="primary" onclick="startTest()">
           Probeprüfung starten
         </button>
 
@@ -579,19 +543,13 @@
 
       <div id="testArea" class="hidden">
 
-        <div
-          id="timer"
-          class="timer"
-        >
+        <div id="timer" class="timer">
           00:00
         </div>
 
         <div id="testQuestions"></div>
 
-        <button
-          class="primary"
-          onclick="finishTest()"
-        >
+        <button class="primary" onclick="finishTest()">
           Prüfung abgeben
         </button>
 
@@ -617,14 +575,12 @@
         später nicht jedes Mal neu eingegeben werden.
       </p>
 
-
       <label>Name</label>
 
       <input
         id="userName"
         placeholder="Dein Name"
       >
-
 
       <label>Bundesland</label>
 
@@ -650,14 +606,12 @@
 
       </select>
 
-
       <label>Schulart</label>
 
       <input
         id="schoolType"
         placeholder="z. B. Gymnasium"
       >
-
 
       <label>Klassenstufe</label>
 
@@ -666,19 +620,11 @@
         placeholder="z. B. 8"
       >
 
-
-      <button
-        class="primary"
-        onclick="saveProfile()"
-      >
+      <button class="primary" onclick="saveProfile()">
         Profil speichern
       </button>
 
-
-      <p
-        id="profileStatus"
-        class="success"
-      ></p>
+      <p id="profileStatus" class="success"></p>
 
     </div>
 
@@ -689,11 +635,9 @@
 
 <script>
 
-  /*
-   * ==========================================
-   * LEARNPATH
-   * ==========================================
-   */
+  /* ==========================================
+     LEARNPATH KONFIGURATION
+  ========================================== */
 
   const SUPABASE_URL =
     "https://varkcelgcnlrvolrhhio.supabase.co";
@@ -701,10 +645,16 @@
   const SUPABASE_KEY =
     "sb_publishable_KzA3gdL3LeerPPhyUQJaPw_z3S450VG";
 
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
 
-  /* =========================
-     SEITEN
-  ========================= */
+
+  /* ==========================================
+     SEITEN-NAVIGATION
+  ========================================== */
 
   function showPage(pageId) {
 
@@ -714,9 +664,14 @@
         page.classList.remove("active");
       });
 
-    document
-      .getElementById(pageId)
-      .classList.add("active");
+    const page =
+      document.getElementById(pageId);
+
+    if (!page) {
+      return;
+    }
+
+    page.classList.add("active");
 
     if (pageId === "plans") {
       renderPlans();
@@ -732,12 +687,17 @@
     }
 
     updateOverview();
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   }
 
 
-  /* =========================
+  /* ==========================================
      PROFIL
-  ========================= */
+  ========================================== */
 
   function saveProfile() {
 
@@ -757,73 +717,82 @@
 
     };
 
-
     if (!profile.name) {
 
       alert("Bitte gib deinen Namen ein.");
 
       return;
-
     }
-
 
     localStorage.setItem(
       "learnpathProfile",
       JSON.stringify(profile)
     );
 
-
     document.getElementById(
       "profileStatus"
     ).textContent =
       "✅ Profil gespeichert!";
-
   }
 
 
   function loadProfile() {
 
-    const saved =
-      JSON.parse(
-        localStorage.getItem("learnpathProfile")
-      );
+    let saved = null;
 
+    try {
 
-    if (!saved) return;
+      saved =
+        JSON.parse(
+          localStorage.getItem(
+            "learnpathProfile"
+          )
+        );
 
+    } catch {
+      saved = null;
+    }
+
+    if (!saved) {
+      return;
+    }
 
     document.getElementById(
       "userName"
     ).value = saved.name || "";
 
-
     document.getElementById(
       "state"
     ).value = saved.state || "";
-
 
     document.getElementById(
       "schoolType"
     ).value = saved.schoolType || "";
 
-
     document.getElementById(
       "gradeLevel"
     ).value = saved.gradeLevel || "";
-
   }
 
 
-  /* =========================
+  /* ==========================================
      LERNPLÄNE
-  ========================= */
+  ========================================== */
 
   function getPlans() {
 
-    return JSON.parse(
-      localStorage.getItem("learnpathPlans")
-    ) || [];
+    try {
 
+      return JSON.parse(
+        localStorage.getItem(
+          "learnpathPlans"
+        )
+      ) || [];
+
+    } catch {
+
+      return [];
+    }
   }
 
 
@@ -833,21 +802,25 @@
       "learnpathPlans",
       JSON.stringify(plans)
     );
-
   }
 
 
   function createPlan() {
 
     const subject =
-      document.getElementById("subject").value.trim();
+      document.getElementById(
+        "subject"
+      ).value.trim();
 
     const examDate =
-      document.getElementById("examDate").value;
+      document.getElementById(
+        "examDate"
+      ).value;
 
     const goal =
-      document.getElementById("goalGrade").value;
-
+      document.getElementById(
+        "goalGrade"
+      ).value;
 
     if (!subject || !examDate || !goal) {
 
@@ -856,30 +829,32 @@
       );
 
       return;
-
     }
 
-
     const exam =
-      new Date(examDate + "T00:00:00");
-
+      new Date(
+        examDate + "T00:00:00"
+      );
 
     const today =
       new Date();
 
-    today.setHours(0,0,0,0);
-
+    today.setHours(
+      0,
+      0,
+      0,
+      0
+    );
 
     const difference =
-      exam.getTime() - today.getTime();
-
+      exam.getTime() -
+      today.getTime();
 
     const days =
       Math.ceil(
         difference /
         (1000 * 60 * 60 * 24)
       );
-
 
     if (days < 1) {
 
@@ -888,9 +863,7 @@
       );
 
       return;
-
     }
-
 
     const plan = {
 
@@ -917,33 +890,26 @@
 
       materialCount:
         0
-
     };
-
 
     const plans =
       getPlans();
-
 
     plans.push(plan);
 
     savePlans(plans);
 
-
     document.getElementById(
       "subject"
     ).value = "";
-
 
     document.getElementById(
       "examDate"
     ).value = "";
 
-
     document.getElementById(
       "goalGrade"
     ).value = "";
-
 
     document.getElementById(
       "planResult"
@@ -959,13 +925,9 @@
 
     `;
 
-
     renderPlans();
-
     renderMaterialPlans();
-
     updateOverview();
-
   }
 
 
@@ -974,14 +936,17 @@
     const today =
       new Date();
 
-    today.setHours(0,0,0,0);
-
+    today.setHours(
+      0,
+      0,
+      0,
+      0
+    );
 
     const exam =
       new Date(
         examDate + "T00:00:00"
       );
-
 
     return Math.ceil(
       (
@@ -990,7 +955,6 @@
       ) /
       (1000 * 60 * 60 * 24)
     );
-
   }
 
 
@@ -999,12 +963,14 @@
     const plans =
       getPlans();
 
-
     const list =
       document.getElementById(
         "planList"
       );
 
+    if (!list) {
+      return;
+    }
 
     if (plans.length === 0) {
 
@@ -1015,38 +981,30 @@
       `;
 
       return;
-
     }
-
 
     list.innerHTML = "";
 
-
-    plans.forEach((plan) => {
+    plans.forEach(plan => {
 
       const days =
         calculateDays(
           plan.examDate
         );
 
-
       let recommendation =
         "📚 Regelmäßig lernen";
-
 
       if (days <= 7) {
 
         recommendation =
           "🔥 Endspurt – täglich lernen";
 
-      }
-      else if (days <= 14) {
+      } else if (days <= 14) {
 
         recommendation =
           "📖 Intensiver lernen";
-
       }
-
 
       list.innerHTML += `
 
@@ -1065,7 +1023,7 @@
 
           <p>
             🎯 Wunschnote:
-            <strong>${plan.goal}</strong>
+            <strong>${escapeHtml(plan.goal)}</strong>
           </p>
 
           <p>
@@ -1106,7 +1064,6 @@
 
           </div>
 
-
           <div class="plan-actions">
 
             <button
@@ -1135,9 +1092,7 @@
         </div>
 
       `;
-
     });
-
   }
 
 
@@ -1149,7 +1104,6 @@
     );
 
     showPage("materials");
-
   }
 
 
@@ -1164,58 +1118,88 @@
 
     setTimeout(() => {
 
-      document
-        .getElementById("materialPlan")
-        .value = String(id);
+      const select =
+        document.getElementById(
+          "materialPlan"
+        );
+
+      if (select) {
+        select.value =
+          String(id);
+      }
 
     }, 50);
-
   }
 
 
   function deletePlan(id) {
 
-    const confirmed =
-      confirm(
+    if (
+      !confirm(
         "Diesen Lernplan wirklich löschen?"
-      );
-
-
-    if (!confirmed) return;
-
+      )
+    ) {
+      return;
+    }
 
     let plans =
       getPlans();
 
-
     plans =
       plans.filter(
-        plan => plan.id !== id
+        plan =>
+          plan.id !== id
       );
-
 
     savePlans(plans);
 
+    const materials =
+      getMaterials().filter(
+        material =>
+          material.planId !== id
+      );
+
+    localStorage.setItem(
+      "learnpathMaterials",
+      JSON.stringify(materials)
+    );
+
+    if (
+      localStorage.getItem(
+        "learnpathCurrentPlan"
+      ) === String(id)
+    ) {
+
+      localStorage.removeItem(
+        "learnpathCurrentPlan"
+      );
+    }
 
     renderPlans();
-
     renderMaterialPlans();
-
+    renderMaterials();
     updateOverview();
-
   }
 
 
-  /* =========================
+  /* ==========================================
      LERNMATERIAL
-  ========================= */
+  ========================================== */
 
   function getMaterials() {
 
-    return JSON.parse(
-      localStorage.getItem("learnpathMaterials")
-    ) || [];
+    try {
 
+      return JSON.parse(
+        localStorage.getItem(
+          "learnpathMaterials"
+        )
+      ) || [];
+
+    } catch {
+
+      return [];
+    }
   }
 
 
@@ -1228,18 +1212,15 @@
         ).value
       );
 
-
     const text =
       document.getElementById(
         "materialText"
       ).value.trim();
 
-
     const fileInput =
       document.getElementById(
         "materialFile"
       );
-
 
     if (!planId) {
 
@@ -1248,30 +1229,27 @@
       );
 
       return;
-
     }
 
-
-    if (!text && fileInput.files.length === 0) {
+    if (
+      !text &&
+      fileInput.files.length === 0
+    ) {
 
       alert(
         "Bitte Lernmaterial auswählen oder Text eingeben."
       );
 
       return;
-
     }
-
 
     const materials =
       getMaterials();
 
-
     const files =
       Array.from(
-        fileInput.files
+        fileInput.files || []
       );
-
 
     const material = {
 
@@ -1286,63 +1264,52 @@
 
       files:
         files.map(
-          file => file.name
+          file =>
+            file.name
         ),
 
       createdAt:
         new Date().toISOString()
-
     };
-
 
     materials.push(material);
 
-
     localStorage.setItem(
       "learnpathMaterials",
-      JSON.stringify(materials)
+      JSON.stringify(
+        materials
+      )
     );
-
 
     updatePlanMaterialCount(
       planId
     );
 
-
     document.getElementById(
       "materialText"
     ).value = "";
-
 
     document.getElementById(
       "materialFile"
     ).value = "";
 
-
     document.getElementById(
       "selectedFiles"
     ).textContent = "";
-
 
     document.getElementById(
       "materialStatus"
     ).textContent =
       "✅ Lernmaterial gespeichert!";
 
-
     renderMaterials();
-
     renderPlans();
-
   }
 
 
-  /*
-   * =========================
-   * NEU:
-   * DATEIEN FÜR DIE KI
-   * =========================
-   */
+  /* ==========================================
+     DATEI → BASE64
+  ========================================== */
 
   function fileToBase64(file) {
 
@@ -1352,43 +1319,60 @@
         const reader =
           new FileReader();
 
-
         reader.onload = () => {
 
-          const result =
-            reader.result;
+          try {
 
+            const result =
+              String(
+                reader.result
+              );
 
-          const base64 =
-            String(result)
-              .split(",")[1];
+            const parts =
+              result.split(",");
 
+            if (
+              parts.length < 2
+            ) {
 
-          resolve(base64);
+              reject(
+                new Error(
+                  "Die Datei konnte nicht gelesen werden."
+                )
+              );
 
+              return;
+            }
+
+            resolve(
+              parts[1]
+            );
+
+          } catch (error) {
+
+            reject(error);
+          }
         };
-
 
         reader.onerror = () => {
 
           reject(
-            reader.error
+            reader.error ||
+            new Error(
+              "Datei konnte nicht gelesen werden."
+            )
           );
-
         };
 
-
         reader.readAsDataURL(file);
-
       }
     );
-
   }
 
 
-  /*
-   * Ausgewählte Dateien anzeigen
-   */
+  /* ==========================================
+     AUSGEWÄHLTE DATEIEN ANZEIGEN
+  ========================================== */
 
   document
     .getElementById("materialFile")
@@ -1397,39 +1381,40 @@
       function () {
 
         const files =
-          Array.from(this.files || []);
-
+          Array.from(
+            this.files || []
+          );
 
         const selected =
           document.getElementById(
             "selectedFiles"
           );
 
+        if (
+          files.length === 0
+        ) {
 
-        if (files.length === 0) {
-
-          selected.textContent = "";
+          selected.textContent =
+            "";
 
           return;
-
         }
-
 
         selected.textContent =
           "📎 Ausgewählt: " +
           files
-            .map(file => file.name)
+            .map(
+              file =>
+                file.name
+            )
             .join(", ");
-
       }
     );
 
 
-  /*
-   * =========================
-   * KI-KARTEIKARTEN
-   * =========================
-   */
+  /* ==========================================
+     KI-KARTEIKARTEN ERSTELLEN
+  ========================================== */
 
   async function createCardsFromMaterial() {
 
@@ -1438,26 +1423,15 @@
         "materialText"
       ).value.trim();
 
-
     const fileInput =
       document.getElementById(
         "materialFile"
       );
 
-
     const files =
       Array.from(
         fileInput.files || []
       );
-
-
-    /*
-     * Jetzt reicht entweder:
-     * - Text
-     * - Bild
-     * - PDF
-     * - oder alles zusammen
-     */
 
     if (
       !text &&
@@ -1469,41 +1443,27 @@
       );
 
       return;
-
     }
-
 
     const status =
       document.getElementById(
         "materialStatus"
       );
 
-
     status.textContent =
       "🤖 KI liest dein Lernmaterial und erstellt Karteikarten...";
 
-
     try {
-
-      /*
-       * Maximal 5 Dateien gleichzeitig
-       */
 
       const selectedFiles =
         files.slice(0, 5);
 
-
       const encodedFiles = [];
-
 
       for (
         const file
         of selectedFiles
       ) {
-
-        /*
-         * Nur unterstützte Dateitypen
-         */
 
         const allowedTypes = [
 
@@ -1516,7 +1476,6 @@
 
         ];
 
-
         if (
           !allowedTypes.includes(
             file.type
@@ -1528,19 +1487,12 @@
             file.name +
             " wird nicht unterstützt."
           );
-
         }
-
-
-        /*
-         * Datei in Base64 umwandeln
-         */
 
         const data =
           await fileToBase64(
             file
           );
-
 
         encodedFiles.push({
 
@@ -1554,20 +1506,13 @@
             data
 
         });
-
       }
-
-
-      /*
-       * Supabase Edge Function aufrufen
-       */
 
       const cards =
         await generateAICards(
           text,
           encodedFiles
         );
-
 
       if (
         !cards ||
@@ -1577,60 +1522,45 @@
         throw new Error(
           "Die KI hat keine Karteikarten erstellt."
         );
-
       }
-
-
-      /*
-       * Vorhandene Karten holen
-       */
 
       const existingCards =
         getCards();
 
+      cards.forEach(card => {
 
-      /*
-       * Neue Karten hinzufügen
-       */
-
-      cards.forEach(
-        card => {
-
-          if (
-            !card.question ||
-            !card.answer
-          ) {
-            return;
-          }
-
-
-          existingCards.push({
-
-            id:
-              Date.now() +
-              Math.random(),
-
-            question:
-              card.question,
-
-            answer:
-              card.answer,
-
-            level:
-              0,
-
-            learned:
-              false
-
-          });
-
+        if (
+          !card ||
+          !card.question ||
+          !card.answer
+        ) {
+          return;
         }
-      );
 
+        existingCards.push({
 
-      /*
-       * Speichern
-       */
+          id:
+            Date.now() +
+            Math.random(),
+
+          question:
+            String(
+              card.question
+            ),
+
+          answer:
+            String(
+              card.answer
+            ),
+
+          level:
+            0,
+
+          learned:
+            false
+
+        });
+      });
 
       localStorage.setItem(
         "learnpathCards",
@@ -1639,109 +1569,111 @@
         )
       );
 
-
-      /*
-       * Oberfläche aktualisieren
-       */
-
       renderCards();
-
       updateOverview();
-
 
       status.textContent =
         `✅ ${cards.length} Karteikarten wurden mit der KI erstellt!`;
 
+    } catch (error) {
 
+      console.error(
+        "KI-Fehler:",
+        error
+      );
+
+      const details =
+        error &&
+        error.message
+          ? error.message
+          : String(error);
+
+      status.textContent =
+        "❌ Die KI konnte keine Karteikarten erstellen.";
+
+      alert(
+        "KI-Fehler:\n\n" +
+        details
+      );
     }
-    catch (error) {
-
-  console.error(
-    "KI-Fehler:",
-    error
-  );
-
-  let details = "";
-
-  if (error instanceof TypeError) {
-    details =
-      "Der Browser konnte keine Verbindung zur KI-Funktion herstellen. " +
-      "Möglicherweise liegt ein CORS-, Netzwerk- oder Verbindungsproblem vor.";
-  } else if (error && error.message) {
-    details = error.message;
-  } else {
-    details = String(error);
   }
 
-  status.textContent =
-    "❌ Die KI konnte keine Karteikarten erstellen.";
 
-  alert(
-    "KI-Fehler:\n\n" +
-    details
-  );
+  /* ==========================================
+     SUPABASE EDGE FUNCTION
+  ========================================== */
 
-}
-
-
-  /*
-   * =========================
-   * KI-ANFRAGE
-   * =========================
-   */
-
-  async function generateAICards(lerntext, files = []) {
-
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-  const { data, error } =
-    await supabaseClient.functions.invoke(
-      "genarere-flashcards",
-      {
-        body: {
-          lerntext: lerntext,
-          files: files
-        }
-      }
-    );
-
-  if (error) {
-    throw new Error(
-      error.message ||
-      "Die KI-Funktion konnte nicht aufgerufen werden."
-    );
-  }
-
-  if (
-    !data ||
-    !Array.isArray(data.cards)
+  async function generateAICards(
+    lerntext,
+    files = []
   ) {
-    throw new Error(
-      "Die KI hat kein gültiges Karteikarten-Format zurückgegeben."
-    );
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.functions.invoke(
+        "genarere-flashcards",
+        {
+          body: {
+
+            lerntext:
+              lerntext,
+
+            files:
+              files
+
+          }
+        }
+      );
+
+    if (error) {
+
+      console.error(
+        "Supabase Functions Fehler:",
+        error
+      );
+
+      throw new Error(
+        error.message ||
+        "Die KI-Funktion konnte nicht aufgerufen werden."
+      );
+    }
+
+    if (
+      !data ||
+      !Array.isArray(
+        data.cards
+      )
+    ) {
+
+      throw new Error(
+        "Die KI hat kein gültiges Karteikarten-Format zurückgegeben."
+      );
+    }
+
+    return data.cards;
   }
 
-  return data.cards;
-}
 
+  /* ==========================================
+     MATERIAL ANZEIGEN
+  ========================================== */
 
-  function updatePlanMaterialCount(planId) {
+  function updatePlanMaterialCount(
+    planId
+  ) {
 
     const plans =
       getPlans();
 
-
     const count =
       getMaterials()
-      .filter(
-        material =>
-          material.planId === planId
-      )
-      .length;
-
+        .filter(
+          material =>
+            material.planId === planId
+        )
+        .length;
 
     const plan =
       plans.find(
@@ -1749,17 +1681,13 @@
           plan.id === planId
       );
 
-
     if (plan) {
 
       plan.materialCount =
         count;
-
     }
 
-
     savePlans(plans);
-
   }
 
 
@@ -1770,46 +1698,37 @@
         "materialPlan"
       );
 
-
-    if (!select) return;
-
+    if (!select) {
+      return;
+    }
 
     const plans =
       getPlans();
 
-
     select.innerHTML =
       '<option value="">Bitte auswählen</option>';
-
 
     plans.forEach(plan => {
 
       select.innerHTML += `
 
         <option value="${plan.id}">
-
           ${escapeHtml(plan.subject)}
-
         </option>
 
       `;
-
     });
-
 
     const current =
       localStorage.getItem(
         "learnpathCurrentPlan"
       );
 
-
     if (current) {
 
       select.value =
         current;
-
     }
-
   }
 
 
@@ -1820,16 +1739,19 @@
         "materialList"
       );
 
+    if (!list) {
+      return;
+    }
 
     const materials =
       getMaterials();
 
-
     const plans =
       getPlans();
 
-
-    if (materials.length === 0) {
+    if (
+      materials.length === 0
+    ) {
 
       list.innerHTML = `
         <p class="empty">
@@ -1838,12 +1760,9 @@
       `;
 
       return;
-
     }
 
-
     list.innerHTML = "";
-
 
     materials.forEach(material => {
 
@@ -1853,6 +1772,12 @@
             p.id === material.planId
         );
 
+      const files =
+        Array.isArray(
+          material.files
+        )
+          ? material.files
+          : [];
 
       list.innerHTML += `
 
@@ -1861,7 +1786,9 @@
           <h3>
             📚 ${
               plan
-              ? escapeHtml(plan.subject)
+              ? escapeHtml(
+                  plan.subject
+                )
               : "Unbekannter Lernplan"
             }
           </h3>
@@ -1870,58 +1797,64 @@
             Gespeichert:
             ${new Date(
               material.createdAt
-            ).toLocaleDateString("de-DE")}
+            ).toLocaleDateString(
+              "de-DE"
+            )}
           </p>
 
           ${
-            material.files.length
-            ? `
-              <p>
-                📎 Dateien:
-                ${material.files
-                  .map(
-                    file =>
-                      escapeHtml(file)
-                  )
-                  .join(", ")}
-              </p>
-            `
-            : ""
+            files.length
+              ? `
+                <p>
+                  📎 Dateien:
+                  ${files
+                    .map(
+                      file =>
+                        escapeHtml(file)
+                    )
+                    .join(", ")}
+                </p>
+              `
+              : ""
           }
 
           ${
             material.text
-            ? `
-              <p>
-                📝 ${escapeHtml(
-                  material.text
-                )}
-              </p>
-            `
-            : ""
+              ? `
+                <p>
+                  📝 ${escapeHtml(
+                    material.text
+                  )}
+                </p>
+              `
+              : ""
           }
 
         </div>
 
       `;
-
     });
-
   }
 
 
-  /* =========================
+  /* ==========================================
      KARTEIKARTEN
-  ========================= */
+  ========================================== */
 
   function getCards() {
 
-    return JSON.parse(
-      localStorage.getItem(
-        "learnpathCards"
-      )
-    ) || [];
+    try {
 
+      return JSON.parse(
+        localStorage.getItem(
+          "learnpathCards"
+        )
+      ) || [];
+
+    } catch {
+
+      return [];
+    }
   }
 
 
@@ -1932,27 +1865,25 @@
         "cardQuestion"
       ).value.trim();
 
-
     const answer =
       document.getElementById(
         "cardAnswer"
       ).value.trim();
 
-
-    if (!question || !answer) {
+    if (
+      !question ||
+      !answer
+    ) {
 
       alert(
         "Bitte Frage und Antwort eingeben."
       );
 
       return;
-
     }
-
 
     const cards =
       getCards();
-
 
     cards.push({
 
@@ -1973,27 +1904,21 @@
 
     });
 
-
     localStorage.setItem(
       "learnpathCards",
       JSON.stringify(cards)
     );
 
-
     document.getElementById(
       "cardQuestion"
     ).value = "";
-
 
     document.getElementById(
       "cardAnswer"
     ).value = "";
 
-
     renderCards();
-
     updateOverview();
-
   }
 
 
@@ -2004,12 +1929,16 @@
         "cardList"
       );
 
+    if (!list) {
+      return;
+    }
 
     const cards =
       getCards();
 
-
-    if (cards.length === 0) {
+    if (
+      cards.length === 0
+    ) {
 
       list.innerHTML = `
 
@@ -2027,79 +1956,72 @@
       `;
 
       return;
-
     }
-
 
     list.innerHTML = "";
 
+    cards.forEach(
+      (card, index) => {
 
-    cards.forEach((card, index) => {
+        list.innerHTML += `
 
-      list.innerHTML += `
+          <div class="flashcard">
 
-        <div class="flashcard">
+            <h3>
+              Karte ${index + 1}
+            </h3>
 
-          <h3>
-            Karte ${index + 1}
-          </h3>
-
-          <p>
-            <strong>Frage:</strong>
-          </p>
-
-          <p>
-            ${escapeHtml(
-              card.question
-            )}
-          </p>
-
-
-          <button
-            class="secondary"
-            onclick="toggleAnswer(${card.id})"
-          >
-            Antwort anzeigen
-          </button>
-
-
-          <div
-            id="answer-${card.id}"
-            class="flashcard-answer"
-          >
-
-            <strong>Antwort:</strong>
+            <p>
+              <strong>Frage:</strong>
+            </p>
 
             <p>
               ${escapeHtml(
-                card.answer
+                card.question
               )}
             </p>
 
-
             <button
               class="secondary"
-              onclick="cardKnown(${card.id})"
+              onclick="toggleAnswer(${card.id})"
             >
-              ✅ Gewusst
+              Antwort anzeigen
             </button>
 
-
-            <button
-              class="secondary"
-              onclick="cardUnknown(${card.id})"
+            <div
+              id="answer-${card.id}"
+              class="flashcard-answer"
             >
-              🔄 Noch einmal
-            </button>
+
+              <strong>Antwort:</strong>
+
+              <p>
+                ${escapeHtml(
+                  card.answer
+                )}
+              </p>
+
+              <button
+                class="secondary"
+                onclick="cardKnown(${card.id})"
+              >
+                ✅ Gewusst
+              </button>
+
+              <button
+                class="secondary"
+                onclick="cardUnknown(${card.id})"
+              >
+                🔄 Noch einmal
+              </button>
+
+            </div>
 
           </div>
 
-        </div>
-
-      `;
-
-    });
-
+        `;
+      }
+    );
   }
 
 
@@ -2110,6 +2032,9 @@
         "answer-" + id
       );
 
+    if (!answer) {
+      return;
+    }
 
     if (
       answer.style.display === "block"
@@ -2118,14 +2043,11 @@
       answer.style.display =
         "none";
 
-    }
-    else {
+    } else {
 
       answer.style.display =
         "block";
-
     }
-
   }
 
 
@@ -2134,16 +2056,15 @@
     const cards =
       getCards();
 
-
     const card =
       cards.find(
         card =>
           card.id === id
       );
 
-
-    if (!card) return;
-
+    if (!card) {
+      return;
+    }
 
     card.level =
       Math.min(
@@ -2151,21 +2072,16 @@
         5
       );
 
-
     card.learned =
       true;
-
 
     localStorage.setItem(
       "learnpathCards",
       JSON.stringify(cards)
     );
 
-
     renderCards();
-
     updateOverview();
-
   }
 
 
@@ -2174,16 +2090,15 @@
     const cards =
       getCards();
 
-
     const card =
       cards.find(
         card =>
           card.id === id
       );
 
-
-    if (!card) return;
-
+    if (!card) {
+      return;
+    }
 
     card.level =
       Math.max(
@@ -2191,31 +2106,28 @@
         0
       );
 
-
     card.learned =
       false;
-
 
     localStorage.setItem(
       "learnpathCards",
       JSON.stringify(cards)
     );
 
-
     renderCards();
-
     updateOverview();
-
   }
 
 
-  /* =========================
+  /* ==========================================
      PROBEPRÜFUNG
-  ========================= */
+  ========================================== */
 
-  let testInterval = null;
+  let testInterval =
+    null;
 
-  let testSeconds = 0;
+  let testSeconds =
+    0;
 
 
   function startTest() {
@@ -2227,57 +2139,55 @@
         ).value
       );
 
-
     testSeconds =
       duration * 60;
 
-
     document.getElementById(
       "testSetup"
-    ).classList.add("hidden");
-
+    ).classList.add(
+      "hidden"
+    );
 
     document.getElementById(
       "testArea"
-    ).classList.remove("hidden");
-
+    ).classList.remove(
+      "hidden"
+    );
 
     document.getElementById(
       "testResult"
     ).innerHTML = "";
 
-
     createPracticeQuestions();
 
-
     updateTimer();
-
 
     clearInterval(
       testInterval
     );
 
-
     testInterval =
-      setInterval(() => {
+      setInterval(
+        () => {
 
-        testSeconds--;
+          testSeconds--;
 
-        updateTimer();
+          updateTimer();
 
+          if (
+            testSeconds <= 0
+          ) {
 
-        if (testSeconds <= 0) {
+            clearInterval(
+              testInterval
+            );
 
-          clearInterval(
-            testInterval
-          );
+            finishTest();
+          }
 
-          finishTest();
-
-        }
-
-      }, 1000);
-
+        },
+        1000
+      );
   }
 
 
@@ -2288,18 +2198,25 @@
         testSeconds / 60
       );
 
-
     const seconds =
       testSeconds % 60;
-
 
     document.getElementById(
       "timer"
     ).textContent =
-      String(minutes).padStart(2,"0")
-      + ":" +
-      String(seconds).padStart(2,"0");
-
+      String(
+        minutes
+      ).padStart(
+        2,
+        "0"
+      ) +
+      ":" +
+      String(
+        seconds
+      ).padStart(
+        2,
+        "0"
+      );
   }
 
 
@@ -2308,14 +2225,14 @@
     const cards =
       getCards();
 
-
     const container =
       document.getElementById(
         "testQuestions"
       );
 
-
-    if (cards.length === 0) {
+    if (
+      cards.length === 0
+    ) {
 
       container.innerHTML = `
 
@@ -2334,19 +2251,18 @@
       `;
 
       return;
-
     }
-
 
     const questions =
       cards.slice(
         0,
-        Math.min(cards.length, 10)
+        Math.min(
+          cards.length,
+          10
+        )
       );
 
-
     container.innerHTML = "";
-
 
     questions.forEach(
       (card, index) => {
@@ -2373,10 +2289,8 @@
           </div>
 
         `;
-
       }
     );
-
   }
 
 
@@ -2386,37 +2300,37 @@
       testInterval
     );
 
-
     const cards =
       getCards();
-
 
     const questions =
       cards.slice(
         0,
-        Math.min(cards.length, 10)
+        Math.min(
+          cards.length,
+          10
+        )
       );
 
-
-    if (questions.length === 0) {
+    if (
+      questions.length === 0
+    ) {
 
       resetTest();
 
       return;
-
     }
 
-
-    let answered = 0;
-
+    let answered =
+      0;
 
     questions.forEach(card => {
 
       const input =
         document.getElementById(
-          "testAnswer-" + card.id
+          "testAnswer-" +
+          card.id
         );
-
 
       if (
         input &&
@@ -2424,11 +2338,8 @@
       ) {
 
         answered++;
-
       }
-
     });
-
 
     const percent =
       Math.round(
@@ -2438,11 +2349,11 @@
         ) * 100
       );
 
-
     document.getElementById(
       "testArea"
-    ).classList.add("hidden");
-
+    ).classList.add(
+      "hidden"
+    );
 
     document.getElementById(
       "testResult"
@@ -2490,7 +2401,6 @@
 
     `;
 
-
     const tests =
       Number(
         localStorage.getItem(
@@ -2498,50 +2408,56 @@
         )
       ) || 0;
 
-
     localStorage.setItem(
       "learnpathTests",
-      String(tests + 1)
+      String(
+        tests + 1
+      )
     );
 
-
     updateOverview();
-
   }
 
 
   function resetTest() {
 
+    clearInterval(
+      testInterval
+    );
+
     document.getElementById(
       "testArea"
-    ).classList.add("hidden");
-
+    ).classList.add(
+      "hidden"
+    );
 
     document.getElementById(
       "testSetup"
-    ).classList.remove("hidden");
-
+    ).classList.remove(
+      "hidden"
+    );
 
     document.getElementById(
       "testResult"
     ).innerHTML = "";
 
+    document.getElementById(
+      "testQuestions"
+    ).innerHTML = "";
   }
 
 
-  /* =========================
+  /* ==========================================
      ÜBERSICHT
-  ========================= */
+  ========================================== */
 
   function updateOverview() {
 
     const plans =
       getPlans();
 
-
     const cards =
       getCards();
-
 
     const learned =
       cards.filter(
@@ -2549,7 +2465,6 @@
           card.learned
       ).length;
 
-
     const tests =
       Number(
         localStorage.getItem(
@@ -2557,38 +2472,34 @@
         )
       ) || 0;
 
-
     document.getElementById(
       "statPlans"
     ).textContent =
       plans.length;
-
 
     document.getElementById(
       "statCards"
     ).textContent =
       cards.length;
 
-
     document.getElementById(
       "statLearned"
     ).textContent =
       learned;
-
 
     document.getElementById(
       "statTests"
     ).textContent =
       tests;
 
-
     const today =
       document.getElementById(
         "todayPlan"
       );
 
-
-    if (plans.length === 0) {
+    if (
+      plans.length === 0
+    ) {
 
       today.innerHTML = `
 
@@ -2599,12 +2510,9 @@
       `;
 
       return;
-
     }
 
-
     today.innerHTML = "";
-
 
     plans.forEach(plan => {
 
@@ -2613,29 +2521,27 @@
           plan.examDate
         );
 
-
       let recommendation;
 
-
-      if (days <= 4) {
+      if (
+        days <= 4
+      ) {
 
         recommendation =
           "🚨 Prüfung steht kurz bevor!";
 
-      }
-      else if (days <= 7) {
+      } else if (
+        days <= 7
+      ) {
 
         recommendation =
           "🔥 Endspurt";
 
-      }
-      else {
+      } else {
 
         recommendation =
           "📚 Regelmäßig lernen";
-
       }
-
 
       today.innerHTML += `
 
@@ -2655,7 +2561,11 @@
           </p>
 
           <p>
-            ⏳ ${days} Tage verbleiben
+            ⏳ ${
+              days > 0
+                ? days + " Tage verbleiben"
+                : "Prüfung ist vorbei"
+            }
           </p>
 
           <p>
@@ -2664,28 +2574,26 @@
 
           ${
             days === 4
-            ? `
-              <div class="warning">
-                📝 Heute ist ein guter
-                Zeitpunkt für deine
-                Probeprüfung!
-              </div>
-            `
-            : ""
+              ? `
+                <div class="warning">
+                  📝 Heute ist ein guter
+                  Zeitpunkt für deine
+                  Probeprüfung!
+                </div>
+              `
+              : ""
           }
 
         </div>
 
       `;
-
     });
-
   }
 
 
-  /* =========================
+  /* ==========================================
      HILFSFUNKTIONEN
-  ========================= */
+  ========================================== */
 
   function formatDate(date) {
 
@@ -2694,25 +2602,38 @@
     ).toLocaleDateString(
       "de-DE"
     );
-
   }
 
 
   function escapeHtml(value) {
 
     return String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "'",
+        "&#039;"
+      );
   }
 
 
-  /* =========================
+  /* ==========================================
      START
-  ========================= */
+  ========================================== */
 
   loadProfile();
 
