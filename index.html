@@ -697,7 +697,7 @@
     "https://varkcelgcnlrvolrhbio.supabase.co";
 
   const SUPABASE_KEY =
-    "HIER_DEINEN_PUBLISHABLE_KEY_EINFÜGEN";
+    "sb_publishable_KzA3gdL3LeerPPhyUQJaPw_z3S450VG";
 
 
   /* =========================
@@ -1525,7 +1525,29 @@
     ) || [];
 
   }
+async function generateAICards(lerntext) {
+  const response = await fetch(
+    "https://varkcelgcnlrvolrhbio.supabase.co/functions/v1/genarere-flashcards",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY
+      },
+      body: JSON.stringify({
+        lerntext: lerntext
+      })
+    }
+  );
 
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || "KI-Fehler");
+  }
+
+  return result.cards || [];
+}
 
   function addCard() {
 
