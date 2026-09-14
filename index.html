@@ -438,11 +438,18 @@
 
 
       <button
-        class="primary"
-        onclick="saveMaterial()"
-      >
-        Lernmaterial speichern
-      </button>
+  class="primary"
+  onclick="saveMaterial()"
+>
+  Lernmaterial speichern
+</button>
+
+<button
+  class="secondary"
+  onclick="createCardsFromMaterial()"
+>
+  🤖 Karteikarten mit KI erstellen
+</button>
 
       <p id="materialStatus" class="success"></p>
 
@@ -1328,7 +1335,53 @@
     renderPlans();
 
   }
+async function createCardsFromMaterial() {
+  const text = document.getElementById("materialText").value.trim();
 
+  if (!text) {
+    alert("Bitte zuerst Lerntext eingeben.");
+    return;
+  }
+
+  const status = document.getElementById("materialStatus");
+  status.textContent = "🤖 KI erstellt gerade deine Karteikarten...";
+
+  try {
+    const cards = await generateAICards(text);
+
+    if (!cards.length) {
+      throw new Error("Die KI hat keine Karteikarten erstellt.");
+    }
+
+    const existingCards = getCards();
+
+    cards.forEach(card => {
+      existingCards.push({
+        id: Date.now() + Math.random(),
+        question: card.question,
+        answer: card.answer,
+        level: 0,
+        learned: false
+      });
+    });
+
+    localStorage.setItem(
+      "learnpathCards",
+      JSON.stringify(existingCards)
+    );
+
+    renderCards();
+    updateOverview();
+
+    status.textContent =
+      `✅ ${cards.length} Karteikarten wurden mit der KI erstellt!`;
+
+  } catch (error) {
+    console.error(error);
+    status.textContent = "❌ Die KI konnte keine Karteikarten erstellen.";
+    alert("KI-Fehler: " + error.message);
+  }
+}
 
   function updatePlanMaterialCount(planId) {
 
