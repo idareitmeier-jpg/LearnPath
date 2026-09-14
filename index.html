@@ -644,11 +644,18 @@
   const SUPABASE_KEY =
     "sb_publishable_KzA3gdL3LeerPPhyUQJaPw_z3S450VG";
 
-  const supabaseClient =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+  let supabaseClient = null;
+
+function initSupabase() {
+  if (!window.supabase) {
+    throw new Error("Supabase konnte nicht geladen werden.");
+  }
+
+  supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+}
 
 
   /* ==========================================
@@ -2633,7 +2640,7 @@
   /* ==========================================
      START
   ========================================== */
-
+initSupabase();
   loadProfile();
 
   renderPlans();
