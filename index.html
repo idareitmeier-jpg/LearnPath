@@ -406,11 +406,15 @@
       </p>
 
       <div class="info">
-        <strong>🤖 KI-Funktion kommt als nächster Schritt</strong>
+
+        <strong>🤖 KI-Karteikarten</strong>
+
         <p>
-          Später kann LearnPath aus deinen Fotos automatisch
-          Lernstoff und Karteikarten erstellen.
+          Lade Text, Fotos oder PDFs hoch.
+          LearnPath kann daraus automatisch
+          Karteikarten erstellen.
         </p>
+
       </div>
 
 
@@ -428,6 +432,11 @@
         multiple
       >
 
+      <p
+        id="selectedFiles"
+        class="small"
+      ></p>
+
 
       <label>Oder Text aus deinem Lernzettel einfügen</label>
 
@@ -438,20 +447,24 @@
 
 
       <button
-  class="primary"
-  onclick="saveMaterial()"
->
-  Lernmaterial speichern
-</button>
+        class="primary"
+        onclick="saveMaterial()"
+      >
+        Lernmaterial speichern
+      </button>
 
-<button
-  class="secondary"
-  onclick="createCardsFromMaterial()"
->
-  🤖 Karteikarten mit KI erstellen
-</button>
+      <button
+        class="secondary"
+        onclick="createCardsFromMaterial()"
+      >
+        🤖 Karteikarten mit KI erstellen
+      </button>
 
-      <p id="materialStatus" class="success"></p>
+
+      <p
+        id="materialStatus"
+        class="success"
+      ></p>
 
     </div>
 
@@ -479,9 +492,8 @@
         <strong>🤖 Automatische Karteikarten</strong>
 
         <p>
-          Sobald die KI-Funktion angeschlossen ist,
-          erstellt LearnPath aus deinen Lernmaterialien
-          automatisch passende Karteikarten.
+          LearnPath kann aus deinem Lernmaterial
+          automatisch passende Karteikarten erstellen.
         </p>
 
       </div>
@@ -681,24 +693,7 @@
    * ==========================================
    * LEARNPATH
    * ==========================================
-   *
-   * Aktuell:
-   * - Speicherung im Browser
-   * - mehrere Lernpläne
-   * - Profil
-   * - Lernmaterial
-   * - Karteikarten
-   * - Lernfortschritt
-   * - Probeprüfung mit Timer
-   *
-   * Später:
-   * - Supabase
-   * - Benutzerkonten
-   * - KI für Fotos
-   * - automatische Karteikarten
-   * - automatische Lernplanung
    */
-
 
   const SUPABASE_URL =
     "https://varkcelgcnlrvolrhbio.supabase.co";
@@ -1027,7 +1022,7 @@
     list.innerHTML = "";
 
 
-    plans.forEach((plan, index) => {
+    plans.forEach((plan) => {
 
       const days =
         calculateDays(
@@ -1036,7 +1031,7 @@
 
 
       let recommendation =
-        "Regelmäßig lernen";
+        "📚 Regelmäßig lernen";
 
 
       if (days <= 7) {
@@ -1048,7 +1043,7 @@
       else if (days <= 14) {
 
         recommendation =
-          "📚 Intensiver lernen";
+          "📖 Intensiver lernen";
 
       }
 
@@ -1083,7 +1078,7 @@
           </p>
 
           <p>
-            🔥 ${recommendation}
+            ${recommendation}
           </p>
 
           <div class="stat-grid">
@@ -1325,6 +1320,11 @@
 
 
     document.getElementById(
+      "selectedFiles"
+    ).textContent = "";
+
+
+    document.getElementById(
       "materialStatus"
     ).textContent =
       "✅ Lernmaterial gespeichert!";
@@ -1335,53 +1335,447 @@
     renderPlans();
 
   }
-async function createCardsFromMaterial() {
-  const text = document.getElementById("materialText").value.trim();
 
-  if (!text) {
-    alert("Bitte zuerst Lerntext eingeben.");
-    return;
-  }
 
-  const status = document.getElementById("materialStatus");
-  status.textContent = "🤖 KI erstellt gerade deine Karteikarten...";
+  /*
+   * =========================
+   * NEU:
+   * DATEIEN FÜR DIE KI
+   * =========================
+   */
 
-  try {
-    const cards = await generateAICards(text);
+  function fileToBase64(file) {
 
-    if (!cards.length) {
-      throw new Error("Die KI hat keine Karteikarten erstellt.");
-    }
+    return new Promise(
+      (resolve, reject) => {
 
-    const existingCards = getCards();
+        const reader =
+          new FileReader();
 
-    cards.forEach(card => {
-      existingCards.push({
-        id: Date.now() + Math.random(),
-        question: card.question,
-        answer: card.answer,
-        level: 0,
-        learned: false
-      });
-    });
 
-    localStorage.setItem(
-      "learnpathCards",
-      JSON.stringify(existingCards)
+        reader.onload = () => {
+
+          const result =
+            reader.result;
+
+
+          const base64 =
+            String(result)
+              .split(",")[1];
+
+
+          resolve(base64);
+
+        };
+
+
+        reader.onerror = () => {
+
+          reject(
+            reader.error
+          );
+
+        };
+
+
+        reader.readAsDataURL(file);
+
+      }
     );
 
-    renderCards();
-    updateOverview();
+  }
+
+
+  /*
+   * Ausgewählte Dateien anzeigen
+   */
+
+  document
+    .getElementById("materialFile")
+    .addEventListener(
+      "change",
+      function () {
+
+        const files =
+          Array.from(this.files || []);
+
+
+        const selected =
+          document.getElementById(
+            "selectedFiles"
+          );
+
+
+        if (files.length === 0) {
+
+          selected.textContent = "";
+
+          return;
+
+        }
+
+
+        selected.textContent =
+          "📎 Ausgewählt: " +
+          files
+            .map(file => file.name)
+            .join(", ");
+
+      }
+    );
+
+
+  /*
+   * =========================
+   * KI-KARTEIKARTEN
+   * =========================
+   */
+
+  async function createCardsFromMaterial() {
+
+    const text =
+      document.getElementById(
+        "materialText"
+      ).value.trim();
+
+
+    const fileInput =
+      document.getElementById(
+        "materialFile"
+      );
+
+
+    const files =
+      Array.from(
+        fileInput.files || []
+      );
+
+
+    /*
+     * Jetzt reicht entweder:
+     * - Text
+     * - Bild
+     * - PDF
+     * - oder alles zusammen
+     */
+
+    if (
+      !text &&
+      files.length === 0
+    ) {
+
+      alert(
+        "Bitte Lerntext eingeben oder mindestens eine Datei auswählen."
+      );
+
+      return;
+
+    }
+
+
+    const status =
+      document.getElementById(
+        "materialStatus"
+      );
+
 
     status.textContent =
-      `✅ ${cards.length} Karteikarten wurden mit der KI erstellt!`;
+      "🤖 KI liest dein Lernmaterial und erstellt Karteikarten...";
 
-  } catch (error) {
-    console.error(error);
-    status.textContent = "❌ Die KI konnte keine Karteikarten erstellen.";
-    alert("KI-Fehler: " + error.message);
+
+    try {
+
+      /*
+       * Maximal 5 Dateien gleichzeitig
+       */
+
+      const selectedFiles =
+        files.slice(0, 5);
+
+
+      const encodedFiles = [];
+
+
+      for (
+        const file
+        of selectedFiles
+      ) {
+
+        /*
+         * Nur unterstützte Dateitypen
+         */
+
+        const allowedTypes = [
+
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "image/heic",
+          "image/heif",
+          "application/pdf"
+
+        ];
+
+
+        if (
+          !allowedTypes.includes(
+            file.type
+          )
+        ) {
+
+          throw new Error(
+            "Die Datei " +
+            file.name +
+            " wird nicht unterstützt."
+          );
+
+        }
+
+
+        /*
+         * Datei in Base64 umwandeln
+         */
+
+        const data =
+          await fileToBase64(
+            file
+          );
+
+
+        encodedFiles.push({
+
+          name:
+            file.name,
+
+          mimeType:
+            file.type,
+
+          data:
+            data
+
+        });
+
+      }
+
+
+      /*
+       * Supabase Edge Function aufrufen
+       */
+
+      const cards =
+        await generateAICards(
+          text,
+          encodedFiles
+        );
+
+
+      if (
+        !cards ||
+        cards.length === 0
+      ) {
+
+        throw new Error(
+          "Die KI hat keine Karteikarten erstellt."
+        );
+
+      }
+
+
+      /*
+       * Vorhandene Karten holen
+       */
+
+      const existingCards =
+        getCards();
+
+
+      /*
+       * Neue Karten hinzufügen
+       */
+
+      cards.forEach(
+        card => {
+
+          if (
+            !card.question ||
+            !card.answer
+          ) {
+            return;
+          }
+
+
+          existingCards.push({
+
+            id:
+              Date.now() +
+              Math.random(),
+
+            question:
+              card.question,
+
+            answer:
+              card.answer,
+
+            level:
+              0,
+
+            learned:
+              false
+
+          });
+
+        }
+      );
+
+
+      /*
+       * Speichern
+       */
+
+      localStorage.setItem(
+        "learnpathCards",
+        JSON.stringify(
+          existingCards
+        )
+      );
+
+
+      /*
+       * Oberfläche aktualisieren
+       */
+
+      renderCards();
+
+      updateOverview();
+
+
+      status.textContent =
+        `✅ ${cards.length} Karteikarten wurden mit der KI erstellt!`;
+
+
+    }
+    catch (error) {
+
+      console.error(
+        "KI-Fehler:",
+        error
+      );
+
+
+      status.textContent =
+        "❌ Die KI konnte keine Karteikarten erstellen.";
+
+
+      alert(
+        "KI-Fehler: " +
+        (
+          error.message ||
+          "Unbekannter Fehler"
+        )
+      );
+
+    }
+
   }
-}
+
+
+  /*
+   * =========================
+   * KI-ANFRAGE
+   * =========================
+   */
+
+  async function generateAICards(
+    lerntext,
+    files = []
+  ) {
+
+    const response =
+      await fetch(
+
+        SUPABASE_URL +
+        "/functions/v1/genarere-flashcards",
+
+        {
+
+          method:
+            "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json",
+
+            "apikey":
+              SUPABASE_KEY
+
+          },
+
+          body:
+            JSON.stringify({
+
+              lerntext:
+                lerntext,
+
+              files:
+                files
+
+            })
+
+        }
+
+      );
+
+
+    let result;
+
+
+    try {
+
+      result =
+        await response.json();
+
+    }
+    catch {
+
+      throw new Error(
+        "Die KI-Funktion hat keine gültige Antwort geliefert."
+      );
+
+    }
+
+
+    if (
+      !response.ok
+    ) {
+
+      throw new Error(
+
+        result?.error ||
+        "Die KI-Funktion hat einen Fehler zurückgegeben."
+
+      );
+
+    }
+
+
+    if (
+      !Array.isArray(
+        result.cards
+      )
+    ) {
+
+      throw new Error(
+        "Die KI hat kein gültiges Karteikarten-Format zurückgegeben."
+      );
+
+    }
+
+
+    return result.cards;
+
+  }
+
 
   function updatePlanMaterialCount(planId) {
 
@@ -1578,29 +1972,7 @@ async function createCardsFromMaterial() {
     ) || [];
 
   }
-async function generateAICards(lerntext) {
-  const response = await fetch(
-    "https://varkcelgcnlrvolrhbio.supabase.co/functions/v1/genarere-flashcards",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": SUPABASE_KEY
-      },
-      body: JSON.stringify({
-        lerntext: lerntext
-      })
-    }
-  );
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.error || "KI-Fehler");
-  }
-
-  return result.cards || [];
-}
 
   function addCard() {
 
@@ -1696,9 +2068,8 @@ async function generateAICards(lerntext) {
 
           <br><br>
 
-          📷 Lade zuerst Lernmaterial hoch.
-          Später erstellt die KI daraus
-          automatisch Karteikarten.
+          📷 Lade zuerst Lernmaterial hoch
+          und erstelle daraus Karteikarten.
 
         </p>
 
