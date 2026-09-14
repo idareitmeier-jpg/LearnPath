@@ -1656,27 +1656,32 @@
     }
     catch (error) {
 
-      console.error(
-        "KI-Fehler:",
-        error
-      );
+  console.error(
+    "KI-Fehler:",
+    error
+  );
 
+  let details = "";
 
-      status.textContent =
-        "❌ Die KI konnte keine Karteikarten erstellen.";
-
-
-      alert(
-        "KI-Fehler: " +
-        (
-          error.message ||
-          "Unbekannter Fehler"
-        )
-      );
-
-    }
-
+  if (error instanceof TypeError) {
+    details =
+      "Der Browser konnte keine Verbindung zur KI-Funktion herstellen. " +
+      "Möglicherweise liegt ein CORS-, Netzwerk- oder Verbindungsproblem vor.";
+  } else if (error && error.message) {
+    details = error.message;
+  } else {
+    details = String(error);
   }
+
+  status.textContent =
+    "❌ Die KI konnte keine Karteikarten erstellen.";
+
+  alert(
+    "KI-Fehler:\n\n" +
+    details
+  );
+
+}
 
 
   /*
