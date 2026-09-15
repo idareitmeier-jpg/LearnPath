@@ -647,7 +647,8 @@
   let supabaseClient = null;
 
 function initSupabase() {
-  if (!window.supabase) {
+ if (!window.supabase) {
+  alert("SUPABASE NICHT GELADEN");
     throw new Error("Supabase konnte nicht geladen werden.");
   }
 
