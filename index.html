@@ -1635,17 +1635,15 @@ function initSupabase() {
       );
 
     if (error) {
+  console.error("Supabase Functions Fehler:", error);
 
-      console.error(
-        "Supabase Functions Fehler:",
-        error
-      );
+  alert(
+    "Supabase-Fehler:\n\n" +
+    JSON.stringify(error, null, 2)
+  );
 
-      throw new Error(
-        error.message ||
-        "Die KI-Funktion konnte nicht aufgerufen werden."
-      );
-    }
+  throw error;
+}
 
     if (
       !data ||
