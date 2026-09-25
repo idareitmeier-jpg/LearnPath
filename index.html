@@ -3,17 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>LearnPath</title>
 
-  <!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: Arial, sans-serif;
@@ -31,9 +26,7 @@
       z-index: 10;
     }
 
-    header h1 {
-      margin-bottom: 15px;
-    }
+    header h1 { margin-bottom: 15px; }
 
     nav {
       display: flex;
@@ -58,13 +51,8 @@
       padding: 20px;
     }
 
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-    }
+    .page { display: none; }
+    .page.active { display: block; }
 
     .card {
       background: white;
@@ -74,17 +62,9 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     }
 
-    h2 {
-      margin-bottom: 15px;
-    }
-
-    h3 {
-      margin-bottom: 10px;
-    }
-
-    p {
-      line-height: 1.5;
-    }
+    h2 { margin-bottom: 15px; }
+    h3 { margin-bottom: 10px; }
+    p { line-height: 1.5; }
 
     label {
       display: block;
@@ -92,9 +72,7 @@
       font-weight: bold;
     }
 
-    input,
-    select,
-    textarea {
+    input, select, textarea {
       width: 100%;
       padding: 12px;
       margin-top: 7px;
@@ -110,35 +88,39 @@
       resize: vertical;
     }
 
+    button.primary,
+    button.secondary,
+    button.danger {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
     button.primary {
       background: #2563eb;
       color: white;
-      border: none;
       padding: 12px 18px;
-      border-radius: 10px;
       font-size: 16px;
-      cursor: pointer;
       margin-top: 5px;
     }
 
     button.secondary {
       background: #e5edff;
       color: #1d4ed8;
-      border: none;
       padding: 10px 14px;
-      border-radius: 10px;
-      cursor: pointer;
       margin-top: 8px;
     }
 
     button.danger {
       background: #fee2e2;
       color: #b91c1c;
-      border: none;
       padding: 10px 14px;
-      border-radius: 10px;
-      cursor: pointer;
       margin-top: 8px;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
     }
 
     .success {
@@ -207,16 +189,57 @@
     .flashcard {
       background: white;
       border: 2px solid #dbeafe;
-      border-radius: 15px;
-      padding: 18px;
+      border-radius: 18px;
+      padding: 24px;
       margin-top: 12px;
     }
 
-    .flashcard-answer {
+    .learning-card {
+      text-align: center;
+      padding: 28px 20px;
+    }
+
+    .learning-question {
+      font-size: 24px;
+      line-height: 1.4;
+      margin: 25px 0;
+    }
+
+    .learning-answer {
       display: none;
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #e5e7eb;
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 18px;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .learning-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .learning-actions button {
+      min-width: 150px;
+      font-size: 16px;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #2563eb;
+      width: 0%;
+      transition: width 0.2s ease;
     }
 
     .test-question {
@@ -244,12 +267,16 @@
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
     .welcome-box {
       text-align: center;
       padding: 30px 20px;
+    }
+
+    .center {
+      text-align: center;
     }
 
     @media (max-width: 600px) {
@@ -263,6 +290,10 @@
 
       nav button {
         padding: 9px 10px;
+      }
+
+      .learning-question {
+        font-size: 21px;
       }
     }
   </style>
@@ -295,8 +326,11 @@
 
     <div class="card">
       <h2>📅 Dein heutiger Lernplan</h2>
+
       <div id="todayPlan">
-        <p class="empty">Erstelle zuerst einen Lernplan.</p>
+        <p class="empty">
+          Erstelle zuerst einen Lernplan.
+        </p>
       </div>
     </div>
 
@@ -336,8 +370,10 @@
 
     <div class="card">
       <h2>📚 Meine Lernpläne</h2>
+
       <div id="planList"></div>
     </div>
+
 
     <div class="card">
 
@@ -351,6 +387,7 @@
         placeholder="z. B. Mathematik"
       >
 
+
       <label>Prüfungsdatum</label>
 
       <input
@@ -358,21 +395,58 @@
         type="date"
       >
 
+
       <label>Wunschnote</label>
 
       <select id="goalGrade">
-        <option value="">Bitte auswählen</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
+
+        <option value="">
+          Bitte auswählen
+        </option>
+
+        <option value="1">
+          1
+        </option>
+
+        <option value="2">
+          2
+        </option>
+
+        <option value="3">
+          3
+        </option>
+
+        <option value="4">
+          4
+        </option>
+
       </select>
 
-      <button class="primary" onclick="createPlan()">
+
+      <button
+        class="primary"
+        onclick="createPlan()"
+      >
         Lernplan erstellen
       </button>
 
       <div id="planResult"></div>
+
+    </div>
+
+  </section>
+
+
+  <!-- LERNMODUS -->
+  <section id="learning" class="page">
+
+    <div class="card">
+
+      <div id="learningHeader"></div>
+
+      <div id="learningProgress"></div>
+
+      <div id="learningArea"></div>
 
     </div>
 
@@ -390,16 +464,19 @@
         Lade deine Lernzettel, Heftseiten oder Arbeitsblätter hoch.
       </p>
 
+
       <div class="info">
 
         <strong>🤖 KI-Karteikarten</strong>
 
         <p>
           Lade Text, Fotos oder PDFs hoch.
-          LearnPath kann daraus automatisch Karteikarten erstellen.
+          LearnPath kann daraus automatisch
+          Karteikarten erstellen.
         </p>
 
       </div>
+
 
       <label>
         Zu welchem Lernplan gehört das Material?
@@ -407,7 +484,10 @@
 
       <select id="materialPlan"></select>
 
-      <label>Material auswählen</label>
+
+      <label>
+        Material auswählen
+      </label>
 
       <input
         id="materialFile"
@@ -416,7 +496,11 @@
         multiple
       >
 
-      <p id="selectedFiles" class="small"></p>
+      <p
+        id="selectedFiles"
+        class="small"
+      ></p>
+
 
       <label>
         Oder Text aus deinem Lernzettel einfügen
@@ -427,15 +511,27 @@
         placeholder="Hier kannst du deinen Lernstoff einfügen..."
       ></textarea>
 
-      <button class="primary" onclick="saveMaterial()">
+
+      <button
+        class="primary"
+        onclick="saveMaterial()"
+      >
         Lernmaterial speichern
       </button>
 
-      <button class="secondary" onclick="createCardsFromMaterial()">
+
+      <button
+        class="secondary"
+        onclick="createCardsFromMaterial()"
+      >
         🤖 Karteikarten mit KI erstellen
       </button>
 
-      <p id="materialStatus" class="success"></p>
+
+      <p
+        id="materialStatus"
+        class="success"
+      ></p>
 
     </div>
 
@@ -458,6 +554,7 @@
 
       <h2>🗂️ Deine Karteikarten</h2>
 
+
       <div class="info">
 
         <strong>🤖 Automatische Karteikarten</strong>
@@ -468,6 +565,7 @@
         </p>
 
       </div>
+
 
       <div id="cardList"></div>
 
@@ -482,21 +580,38 @@
         Diese Funktion bleibt vorerst zum Testen vorhanden.
       </p>
 
-      <label>Frage</label>
+
+      <label>
+        Zu welchem Lernplan?
+      </label>
+
+      <select id="manualCardPlan"></select>
+
+
+      <label>
+        Frage
+      </label>
 
       <input
         id="cardQuestion"
         placeholder="Deine Frage"
       >
 
-      <label>Antwort</label>
+
+      <label>
+        Antwort
+      </label>
 
       <input
         id="cardAnswer"
         placeholder="Die Antwort"
       >
 
-      <button class="primary" onclick="addCard()">
+
+      <button
+        class="primary"
+        onclick="addCard()"
+      >
         Karte speichern
       </button>
 
@@ -512,6 +627,7 @@
 
       <h2>📝 Probeprüfung</h2>
 
+
       <div id="testSetup">
 
         <p>
@@ -520,35 +636,61 @@
           aus deinem Lernstoff erstellen.
         </p>
 
-        <label>Prüfungsdauer</label>
+
+        <label>
+          Prüfungsdauer
+        </label>
 
         <select id="testDuration">
 
-          <option value="15">15 Minuten</option>
-          <option value="30">30 Minuten</option>
-          <option value="45">45 Minuten</option>
-          <option value="60">60 Minuten</option>
-          <option value="90">90 Minuten</option>
-          <option value="120">120 Minuten</option>
+          <option value="15">
+            15 Minuten
+          </option>
+
+          <option value="30">
+            30 Minuten
+          </option>
+
+          <option value="45">
+            45 Minuten
+          </option>
+
+          <option value="60">
+            60 Minuten
+          </option>
 
         </select>
 
-        <button class="primary" onclick="startTest()">
+
+        <button
+          class="primary"
+          onclick="startTest()"
+        >
           Probeprüfung starten
         </button>
 
       </div>
 
 
-      <div id="testArea" class="hidden">
+      <div
+        id="testArea"
+        class="hidden"
+      >
 
-        <div id="timer" class="timer">
+        <div
+          id="timer"
+          class="timer"
+        >
           00:00
         </div>
 
         <div id="testQuestions"></div>
 
-        <button class="primary" onclick="finishTest()">
+
+        <button
+          class="primary"
+          onclick="finishTest()"
+        >
           Prüfung abgeben
         </button>
 
@@ -567,25 +709,29 @@
 
     <div class="card">
 
-      <h2>👤 Dein Profil</h2>
+      <h2>👤 Mein Profil</h2>
 
-      <p>
-        Diese Angaben werden gespeichert und müssen
-        später nicht jedes Mal neu eingegeben werden.
-      </p>
 
-      <label>Name</label>
+      <label>
+        Name
+      </label>
 
       <input
-        id="userName"
+        id="profileName"
         placeholder="Dein Name"
       >
 
-      <label>Bundesland</label>
 
-      <select id="state">
+      <label>
+        Bundesland
+      </label>
 
-        <option value="">Bitte auswählen</option>
+      <select id="profileState">
+
+        <option value="">
+          Bitte auswählen
+        </option>
+
         <option>Bayern</option>
         <option>Baden-Württemberg</option>
         <option>Berlin</option>
@@ -605,25 +751,52 @@
 
       </select>
 
-      <label>Schulart</label>
+
+      <label>
+        Schulart
+      </label>
+
+      <select id="profileSchool">
+
+        <option value="">
+          Bitte auswählen
+        </option>
+
+        <option>Gymnasium</option>
+        <option>Realschule</option>
+        <option>Mittelschule</option>
+        <option>Gesamtschule</option>
+        <option>Oberschule</option>
+        <option>Gemeinschaftsschule</option>
+
+      </select>
+
+
+      <label>
+        Klasse
+      </label>
 
       <input
-        id="schoolType"
-        placeholder="z. B. Gymnasium"
-      >
-
-      <label>Klassenstufe</label>
-
-      <input
-        id="gradeLevel"
+        id="profileGrade"
+        type="number"
+        min="1"
+        max="13"
         placeholder="z. B. 8"
       >
 
-      <button class="primary" onclick="saveProfile()">
+
+      <button
+        class="primary"
+        onclick="saveProfile()"
+      >
         Profil speichern
       </button>
 
-      <p id="profileStatus" class="success"></p>
+
+      <p
+        id="profileStatus"
+        class="success"
+      ></p>
 
     </div>
 
@@ -635,32 +808,102 @@
 <script>
 
   /* ==========================================
-     LEARNPATH KONFIGURATION
+     SUPABASE
   ========================================== */
 
   const SUPABASE_URL =
     "https://varkcelgcnlrvolrhhio.supabase.co";
 
   const SUPABASE_KEY =
-    "sb_publishable_KzA3gdL3LeerPPhyUQJaPw_z3S450VG";
+    "sb_publishable_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
   let supabaseClient = null;
 
-function initSupabase() {
- if (!window.supabase) {
-  alert("SUPABASE NICHT GELADEN");
-    throw new Error("Supabase konnte nicht geladen werden.");
-  }
 
-  supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-}
+  function initSupabase() {
+
+    if (!window.supabase) {
+
+      alert("SUPABASE NICHT GELADEN");
+
+      throw new Error(
+        "Supabase konnte nicht geladen werden."
+      );
+
+    }
+
+    supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+  }
 
 
   /* ==========================================
-     SEITEN-NAVIGATION
+     DATEN
+  ========================================== */
+
+  function getPlans() {
+
+    return JSON.parse(
+      localStorage.getItem("learnpathPlans") || "[]"
+    );
+
+  }
+
+
+  function savePlans(plans) {
+
+    localStorage.setItem(
+      "learnpathPlans",
+      JSON.stringify(plans)
+    );
+
+  }
+
+
+  function getCards() {
+
+    return JSON.parse(
+      localStorage.getItem("learnpathCards") || "[]"
+    );
+
+  }
+
+
+  function saveCards(cards) {
+
+    localStorage.setItem(
+      "learnpathCards",
+      JSON.stringify(cards)
+    );
+
+  }
+
+
+  function getMaterials() {
+
+    return JSON.parse(
+      localStorage.getItem("learnpathMaterials") || "[]"
+    );
+
+  }
+
+
+  function saveMaterials(materials) {
+
+    localStorage.setItem(
+      "learnpathMaterials",
+      JSON.stringify(materials)
+    );
+
+  }
+
+
+  /* ==========================================
+     SEITEN
   ========================================== */
 
   function showPage(pageId) {
@@ -671,114 +914,46 @@ function initSupabase() {
         page.classList.remove("active");
       });
 
+
     const page =
       document.getElementById(pageId);
 
-    if (!page) {
-      return;
+    if (page) {
+      page.classList.add("active");
     }
 
-    page.classList.add("active");
+
+    if (pageId === "overview") {
+      updateOverview();
+    }
+
 
     if (pageId === "plans") {
       renderPlans();
     }
+
 
     if (pageId === "materials") {
       renderMaterialPlans();
       renderMaterials();
     }
 
+
     if (pageId === "cards") {
+      renderManualCardPlans();
       renderCards();
     }
 
-    updateOverview();
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-  }
-
-
-  /* ==========================================
-     PROFIL
-  ========================================== */
-
-  function saveProfile() {
-
-    const profile = {
-
-      name:
-        document.getElementById("userName").value.trim(),
-
-      state:
-        document.getElementById("state").value,
-
-      schoolType:
-        document.getElementById("schoolType").value.trim(),
-
-      gradeLevel:
-        document.getElementById("gradeLevel").value.trim()
-
-    };
-
-    if (!profile.name) {
-
-      alert("Bitte gib deinen Namen ein.");
-
-      return;
+    if (pageId === "profile") {
+      loadProfile();
     }
 
-    localStorage.setItem(
-      "learnpathProfile",
-      JSON.stringify(profile)
-    );
 
-    document.getElementById(
-      "profileStatus"
-    ).textContent =
-      "✅ Profil gespeichert!";
-  }
-
-
-  function loadProfile() {
-
-    let saved = null;
-
-    try {
-
-      saved =
-        JSON.parse(
-          localStorage.getItem(
-            "learnpathProfile"
-          )
-        );
-
-    } catch {
-      saved = null;
+    if (pageId === "learning") {
+      startLearningSession();
     }
 
-    if (!saved) {
-      return;
-    }
-
-    document.getElementById(
-      "userName"
-    ).value = saved.name || "";
-
-    document.getElementById(
-      "state"
-    ).value = saved.state || "";
-
-    document.getElementById(
-      "schoolType"
-    ).value = saved.schoolType || "";
-
-    document.getElementById(
-      "gradeLevel"
-    ).value = saved.gradeLevel || "";
   }
 
 
@@ -786,202 +961,91 @@ function initSupabase() {
      LERNPLÄNE
   ========================================== */
 
-  function getPlans() {
-
-    try {
-
-      return JSON.parse(
-        localStorage.getItem(
-          "learnpathPlans"
-        )
-      ) || [];
-
-    } catch {
-
-      return [];
-    }
-  }
-
-
-  function savePlans(plans) {
-
-    localStorage.setItem(
-      "learnpathPlans",
-      JSON.stringify(plans)
-    );
-  }
-
-
   function createPlan() {
 
     const subject =
-      document.getElementById(
-        "subject"
-      ).value.trim();
+      document
+        .getElementById("subject")
+        .value
+        .trim();
 
     const examDate =
-      document.getElementById(
-        "examDate"
-      ).value;
+      document
+        .getElementById("examDate")
+        .value;
 
-    const goal =
-      document.getElementById(
-        "goalGrade"
-      ).value;
+    const goalGrade =
+      document
+        .getElementById("goalGrade")
+        .value;
 
-    if (!subject || !examDate || !goal) {
 
-      alert(
-        "Bitte Fach, Prüfungsdatum und Wunschnote auswählen."
-      );
+    if (!subject || !examDate) {
 
-      return;
-    }
-
-    const exam =
-      new Date(
-        examDate + "T00:00:00"
-      );
-
-    const today =
-      new Date();
-
-    today.setHours(
-      0,
-      0,
-      0,
-      0
-    );
-
-    const difference =
-      exam.getTime() -
-      today.getTime();
-
-    const days =
-      Math.ceil(
-        difference /
-        (1000 * 60 * 60 * 24)
-      );
-
-    if (days < 1) {
-
-      alert(
-        "Bitte wähle ein zukünftiges Prüfungsdatum."
-      );
+      document.getElementById("planResult").innerHTML = `
+        <div class="warning">
+          Bitte Fach und Prüfungsdatum eingeben.
+        </div>
+      `;
 
       return;
     }
+
+
+    const plans = getPlans();
+
 
     const plan = {
 
-      id:
-        Date.now(),
+      id: Date.now() + Math.random(),
 
-      subject:
-        subject,
+      subject,
 
-      examDate:
-        examDate,
+      examDate,
 
-      goal:
-        goal,
+      goalGrade,
 
-      createdAt:
-        new Date().toISOString(),
+      createdAt: todayKey()
 
-      progress:
-        0,
-
-      cardsLearned:
-        0,
-
-      materialCount:
-        0
     };
 
-    const plans =
-      getPlans();
 
     plans.push(plan);
 
     savePlans(plans);
 
-    document.getElementById(
-      "subject"
-    ).value = "";
 
-    document.getElementById(
-      "examDate"
-    ).value = "";
+    document.getElementById("subject").value = "";
+    document.getElementById("examDate").value = "";
+    document.getElementById("goalGrade").value = "";
 
-    document.getElementById(
-      "goalGrade"
-    ).value = "";
 
-    document.getElementById(
-      "planResult"
-    ).innerHTML = `
-
-      <div class="success">
-
-        ✅ Lernplan für
-        <strong>${escapeHtml(subject)}</strong>
-        wurde erstellt!
-
-      </div>
-
+    document.getElementById("planResult").innerHTML = `
+      <p class="success">
+        ✅ Lernplan wurde erstellt.
+      </p>
     `;
+
 
     renderPlans();
     renderMaterialPlans();
+    renderManualCardPlans();
     updateOverview();
-  }
 
-
-  function calculateDays(examDate) {
-
-    const today =
-      new Date();
-
-    today.setHours(
-      0,
-      0,
-      0,
-      0
-    );
-
-    const exam =
-      new Date(
-        examDate + "T00:00:00"
-      );
-
-    return Math.ceil(
-      (
-        exam.getTime() -
-        today.getTime()
-      ) /
-      (1000 * 60 * 60 * 24)
-    );
   }
 
 
   function renderPlans() {
 
-    const plans =
-      getPlans();
+    const plans = getPlans();
 
-    const list =
-      document.getElementById(
-        "planList"
-      );
+    const container =
+      document.getElementById("planList");
 
-    if (!list) {
-      return;
-    }
 
     if (plans.length === 0) {
 
-      list.innerHTML = `
+      container.innerHTML = `
         <p class="empty">
           Noch keine Lernpläne vorhanden.
         </p>
@@ -990,102 +1054,85 @@ function initSupabase() {
       return;
     }
 
-    list.innerHTML = "";
+
+    container.innerHTML = "";
+
 
     plans.forEach(plan => {
 
       const days =
-        calculateDays(
-          plan.examDate
-        );
+        calculateDays(plan.examDate);
 
-      let recommendation =
-        "📚 Regelmäßig lernen";
+      const cardCount =
+        getCards()
+          .filter(card => card.planId === plan.id)
+          .length;
 
-      if (days <= 7) {
 
-        recommendation =
-          "🔥 Endspurt – täglich lernen";
+      const todayCount =
+        getTodayCardsForPlan(plan.id).length;
 
-      } else if (days <= 14) {
 
-        recommendation =
-          "📖 Intensiver lernen";
-      }
-
-      list.innerHTML += `
+      container.innerHTML += `
 
         <div class="plan">
 
           <h3>
-            📚 ${escapeHtml(plan.subject)}
+            ${escapeHtml(plan.subject)}
           </h3>
 
           <p>
             📅 Prüfung:
-            <strong>
-              ${formatDate(plan.examDate)}
-            </strong>
+            ${formatDate(plan.examDate)}
           </p>
 
           <p>
-            🎯 Wunschnote:
-            <strong>${escapeHtml(plan.goal)}</strong>
-          </p>
-
-          <p>
-            ⏳
-            ${
+            ⏳ ${
               days > 0
-              ? days + " Tage verbleiben"
-              : "Prüfung ist vorbei"
+                ? days + " Tage verbleiben"
+                : "Prüfung ist vorbei"
             }
           </p>
 
           <p>
-            ${recommendation}
+            🗂️ Karteikarten:
+            ${cardCount}
           </p>
 
-          <div class="stat-grid">
+          <p>
+            📖 Heute fällig:
+            ${todayCount}
+          </p>
 
-            <div class="stat">
-              Fortschritt
-              <strong>
-                ${plan.progress || 0}%
-              </strong>
-            </div>
+          ${
+            plan.goalGrade
+              ? `
+                <p>
+                  🎯 Wunschnote:
+                  ${escapeHtml(plan.goalGrade)}
+                </p>
+              `
+              : ""
+          }
 
-            <div class="stat">
-              Lernmaterial
-              <strong>
-                ${plan.materialCount || 0}
-              </strong>
-            </div>
-
-            <div class="stat">
-              Gelernte Karten
-              <strong>
-                ${plan.cardsLearned || 0}
-              </strong>
-            </div>
-
-          </div>
 
           <div class="plan-actions">
 
             <button
-              class="secondary"
+              class="primary"
               onclick="selectPlan(${plan.id})"
             >
               📖 Lernen
             </button>
 
+
             <button
               class="secondary"
-              onclick="selectMaterialPlan(${plan.id})"
+              onclick="showPlanCards(${plan.id})"
             >
-              📷 Material hinzufügen
+              🗂️ Karten ansehen
             </button>
+
 
             <button
               class="danger"
@@ -1099,93 +1146,89 @@ function initSupabase() {
         </div>
 
       `;
+
     });
+
+  }
+
+
+  function calculateDays(dateString) {
+
+    const today =
+      new Date();
+
+    today.setHours(0, 0, 0, 0);
+
+
+    const exam =
+      new Date(
+        dateString + "T00:00:00"
+      );
+
+    exam.setHours(0, 0, 0, 0);
+
+
+    return Math.ceil(
+      (exam - today) /
+      (1000 * 60 * 60 * 24)
+    );
+
   }
 
 
   function selectPlan(id) {
-
-  localStorage.setItem(
-    "learnpathCurrentPlan",
-    String(id)
-  );
-
-  showPage("learning");
-}
-
-
-  function selectMaterialPlan(id) {
 
     localStorage.setItem(
       "learnpathCurrentPlan",
       String(id)
     );
 
-    showPage("materials");
+    showPage("learning");
 
-    setTimeout(() => {
-
-      const select =
-        document.getElementById(
-          "materialPlan"
-        );
-
-      if (select) {
-        select.value =
-          String(id);
-      }
-
-    }, 50);
   }
 
 
   function deletePlan(id) {
 
-    if (
-      !confirm(
-        "Diesen Lernplan wirklich löschen?"
-      )
-    ) {
-      return;
-    }
-
-    let plans =
-      getPlans();
-
-    plans =
-      plans.filter(
-        plan =>
-          plan.id !== id
-      );
+    const plans = getPlans()
+      .filter(plan => plan.id !== id);
 
     savePlans(plans);
 
+
     const materials =
-      getMaterials().filter(
-        material =>
-          material.planId !== id
-      );
+      getMaterials()
+        .filter(material => material.planId !== id);
 
-    localStorage.setItem(
-      "learnpathMaterials",
-      JSON.stringify(materials)
-    );
+    saveMaterials(materials);
 
-    if (
-      localStorage.getItem(
-        "learnpathCurrentPlan"
-      ) === String(id)
-    ) {
 
-      localStorage.removeItem(
-        "learnpathCurrentPlan"
-      );
-    }
+    const cards =
+      getCards()
+        .filter(card => card.planId !== id);
+
+    saveCards(cards);
+
 
     renderPlans();
     renderMaterialPlans();
+    renderManualCardPlans();
     renderMaterials();
+    renderCards();
     updateOverview();
+
+  }
+
+
+  function showPlanCards(id) {
+
+    localStorage.setItem(
+      "learnpathCurrentPlan",
+      String(id)
+    );
+
+    showPage("cards");
+
   }
 
 
@@ -1193,576 +1236,197 @@ function initSupabase() {
      LERNMATERIAL
   ========================================== */
 
-  function getMaterials() {
+  function renderMaterialPlans() {
 
-    try {
+    const select =
+      document.getElementById("materialPlan");
 
-      return JSON.parse(
-        localStorage.getItem(
-          "learnpathMaterials"
-        )
-      ) || [];
+    if (!select) return;
 
-    } catch {
 
-      return [];
+    const plans = getPlans();
+
+
+    select.innerHTML = "";
+
+
+    if (plans.length === 0) {
+
+      select.innerHTML = `
+        <option value="">
+          Erst einen Lernplan erstellen
+        </option>
+      `;
+
+      return;
     }
+
+
+    plans.forEach(plan => {
+
+      select.innerHTML += `
+        <option value="${plan.id}">
+          ${escapeHtml(plan.subject)}
+        </option>
+      `;
+
+    });
+
   }
 
 
-  function saveMaterial() {
+  function renderManualCardPlans() {
+
+    const select =
+      document.getElementById("manualCardPlan");
+
+    if (!select) return;
+
+
+    const plans = getPlans();
+
+
+    select.innerHTML = "";
+
+
+    if (plans.length === 0) {
+
+      select.innerHTML = `
+        <option value="">
+          Erst einen Lernplan erstellen
+        </option>
+      `;
+
+      return;
+    }
+
+
+    plans.forEach(plan => {
+
+      select.innerHTML += `
+        <option value="${plan.id}">
+          ${escapeHtml(plan.subject)}
+        </option>
+      `;
+
+    });
+
+  }
+
+
+  document
+    .getElementById("materialFile")
+    .addEventListener("change", function() {
+
+      const files = [...this.files];
+
+      document.getElementById(
+        "selectedFiles"
+      ).textContent =
+        files.length
+          ? files.map(file => file.name).join(", ")
+          : "";
+
+    });
+
+
+  async function saveMaterial() {
 
     const planId =
       Number(
-        document.getElementById(
-          "materialPlan"
-        ).value
+        document.getElementById("materialPlan").value
       );
+
 
     const text =
-      document.getElementById(
-        "materialText"
-      ).value.trim();
+      document
+        .getElementById("materialText")
+        .value
+        .trim();
+
 
     const fileInput =
-      document.getElementById(
-        "materialFile"
-      );
+      document.getElementById("materialFile");
+
 
     if (!planId) {
 
-      alert(
-        "Bitte zuerst einen Lernplan auswählen."
-      );
+      document.getElementById(
+        "materialStatus"
+      ).textContent =
+        "⚠️ Bitte zuerst einen Lernplan auswählen.";
 
       return;
     }
 
-    if (
-      !text &&
-      fileInput.files.length === 0
-    ) {
 
-      alert(
-        "Bitte Lernmaterial auswählen oder Text eingeben."
-      );
+    if (!text && fileInput.files.length === 0) {
+
+      document.getElementById(
+        "materialStatus"
+      ).textContent =
+        "⚠️ Bitte Text oder Datei hinzufügen.";
 
       return;
     }
+
 
     const materials =
       getMaterials();
 
-    const files =
-      Array.from(
-        fileInput.files || []
-      );
 
     const material = {
 
-      id:
-        Date.now(),
+      id: Date.now() + Math.random(),
 
-      planId:
-        planId,
+      planId,
 
-      text:
-        text,
+      text,
 
       files:
-        files.map(
-          file =>
-            file.name
+        [...fileInput.files].map(
+          file => file.name
         ),
 
-      createdAt:
-        new Date().toISOString()
+      createdAt: todayKey()
+
     };
+
 
     materials.push(material);
 
-    localStorage.setItem(
-      "learnpathMaterials",
-      JSON.stringify(
-        materials
-      )
-    );
+    saveMaterials(materials);
 
-    updatePlanMaterialCount(
-      planId
-    );
+
+    document.getElementById(
+      "materialStatus"
+    ).textContent =
+      "✅ Lernmaterial gespeichert.";
+
 
     document.getElementById(
       "materialText"
     ).value = "";
 
-    document.getElementById(
-      "materialFile"
-    ).value = "";
+    fileInput.value = "";
 
     document.getElementById(
       "selectedFiles"
     ).textContent = "";
 
-    document.getElementById(
-      "materialStatus"
-    ).textContent =
-      "✅ Lernmaterial gespeichert!";
 
     renderMaterials();
-    renderPlans();
-  }
 
-
-  /* ==========================================
-     DATEI → BASE64
-  ========================================== */
-
-  function fileToBase64(file) {
-
-    return new Promise(
-      (resolve, reject) => {
-
-        const reader =
-          new FileReader();
-
-        reader.onload = () => {
-
-          try {
-
-            const result =
-              String(
-                reader.result
-              );
-
-            const parts =
-              result.split(",");
-
-            if (
-              parts.length < 2
-            ) {
-
-              reject(
-                new Error(
-                  "Die Datei konnte nicht gelesen werden."
-                )
-              );
-
-              return;
-            }
-
-            resolve(
-              parts[1]
-            );
-
-          } catch (error) {
-
-            reject(error);
-          }
-        };
-
-        reader.onerror = () => {
-
-          reject(
-            reader.error ||
-            new Error(
-              "Datei konnte nicht gelesen werden."
-            )
-          );
-        };
-
-        reader.readAsDataURL(file);
-      }
-    );
-  }
-
-
-  /* ==========================================
-     AUSGEWÄHLTE DATEIEN ANZEIGEN
-  ========================================== */
-
-  document
-    .getElementById("materialFile")
-    .addEventListener(
-      "change",
-      function () {
-
-        const files =
-          Array.from(
-            this.files || []
-          );
-
-        const selected =
-          document.getElementById(
-            "selectedFiles"
-          );
-
-        if (
-          files.length === 0
-        ) {
-
-          selected.textContent =
-            "";
-
-          return;
-        }
-
-        selected.textContent =
-          "📎 Ausgewählt: " +
-          files
-            .map(
-              file =>
-                file.name
-            )
-            .join(", ");
-      }
-    );
-
-
-  /* ==========================================
-     KI-KARTEIKARTEN ERSTELLEN
-  ========================================== */
-
-  async function createCardsFromMaterial() {
-
-    const text =
-      document.getElementById(
-        "materialText"
-      ).value.trim();
-
-    const fileInput =
-      document.getElementById(
-        "materialFile"
-      );
-
-    const files =
-      Array.from(
-        fileInput.files || []
-      );
-
-    if (
-      !text &&
-      files.length === 0
-    ) {
-
-      alert(
-        "Bitte Lerntext eingeben oder mindestens eine Datei auswählen."
-      );
-
-      return;
-    }
-
-    const status =
-      document.getElementById(
-        "materialStatus"
-      );
-
-    status.textContent =
-      "🤖 KI liest dein Lernmaterial und erstellt Karteikarten...";
-
-    try {
-
-      const selectedFiles =
-        files.slice(0, 5);
-
-      const encodedFiles = [];
-
-      for (
-        const file
-        of selectedFiles
-      ) {
-
-        const allowedTypes = [
-
-          "image/jpeg",
-          "image/png",
-          "image/webp",
-          "image/heic",
-          "image/heif",
-          "application/pdf"
-
-        ];
-
-        if (
-          !allowedTypes.includes(
-            file.type
-          )
-        ) {
-
-          throw new Error(
-            "Die Datei " +
-            file.name +
-            " wird nicht unterstützt."
-          );
-        }
-
-        const data =
-          await fileToBase64(
-            file
-          );
-
-        encodedFiles.push({
-
-          name:
-            file.name,
-
-          mimeType:
-            file.type,
-
-          data:
-            data
-
-        });
-      }
-
-      const cards =
-        await generateAICards(
-          text,
-          encodedFiles
-        );
-
-      if (
-        !cards ||
-        cards.length === 0
-      ) {
-
-        throw new Error(
-          "Die KI hat keine Karteikarten erstellt."
-        );
-      }
-
-      const existingCards =
-        getCards();
-
-      cards.forEach(card => {
-
-        if (
-          !card ||
-          !card.question ||
-          !card.answer
-        ) {
-          return;
-        }
-
-        existingCards.push({
-
-  id:
-    Date.now() +
-    Math.random(),
-
-  planId:
-    Number(
-      document.getElementById(
-        "materialPlan"
-      ).value
-    ),
-
-  question:
-    String(
-      card.question
-    ),
-
-  answer:
-    String(
-      card.answer
-    ),
-
-  level:
-    0,
-
-  learned:
-    false,
-
-  failedToday:
-    false,
-
-  firstFailedToday:
-    false,
-
-  lastReviewDate:
-    null
-
-});
-      });
-
-      localStorage.setItem(
-        "learnpathCards",
-        JSON.stringify(
-          existingCards
-        )
-      );
-
-      renderCards();
-      updateOverview();
-
-      status.textContent =
-        `✅ ${cards.length} Karteikarten wurden mit der KI erstellt!`;
-
-    } catch (error) {
-
-      console.error(
-        "KI-Fehler:",
-        error
-      );
-
-      const details =
-        error &&
-        error.message
-          ? error.message
-          : String(error);
-
-      status.textContent =
-        "❌ Die KI konnte keine Karteikarten erstellen.";
-
-      alert(
-        "KI-Fehler:\n\n" +
-        details
-      );
-    }
-  }
-
-
-  /* ==========================================
-     SUPABASE EDGE FUNCTION
-  ========================================== */
-
-  async function generateAICards(
-    lerntext,
-    files = []
-  ) {
-
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.functions.invoke(
-        "generare-flashcards",
-        {
-          body: {
-
-            lerntext:
-              lerntext,
-
-            files:
-              files
-
-          }
-        }
-      );
-
-    if (error) {
-  console.error("Supabase Functions Fehler:", error);
-
-  alert(
-    "Supabase-Fehler:\n\n" +
-    JSON.stringify(error, null, 2)
-  );
-
-  throw error;
-}
-
-    if (
-      !data ||
-      !Array.isArray(
-        data.cards
-      )
-    ) {
-
-      throw new Error(
-        "Die KI hat kein gültiges Karteikarten-Format zurückgegeben."
-      );
-    }
-
-    return data.cards;
-  }
-
-
-  /* ==========================================
-     MATERIAL ANZEIGEN
-  ========================================== */
-
-  function updatePlanMaterialCount(
-    planId
-  ) {
-
-    const plans =
-      getPlans();
-
-    const count =
-      getMaterials()
-        .filter(
-          material =>
-            material.planId === planId
-        )
-        .length;
-
-    const plan =
-      plans.find(
-        plan =>
-          plan.id === planId
-      );
-
-    if (plan) {
-
-      plan.materialCount =
-        count;
-    }
-
-    savePlans(plans);
-  }
-
-
-  function renderMaterialPlans() {
-
-    const select =
-      document.getElementById(
-        "materialPlan"
-      );
-
-    if (!select) {
-      return;
-    }
-
-    const plans =
-      getPlans();
-
-    select.innerHTML =
-      '<option value="">Bitte auswählen</option>';
-
-    plans.forEach(plan => {
-
-      select.innerHTML += `
-
-        <option value="${plan.id}">
-          ${escapeHtml(plan.subject)}
-        </option>
-
-      `;
-    });
-
-    const current =
-      localStorage.getItem(
-        "learnpathCurrentPlan"
-      );
-
-    if (current) {
-
-      select.value =
-        current;
-    }
   }
 
 
   function renderMaterials() {
 
-    const list =
-      document.getElementById(
-        "materialList"
-      );
+    const container =
+      document.getElementById("materialList");
 
-    if (!list) {
-      return;
-    }
+    if (!container) return;
+
 
     const materials =
       getMaterials();
@@ -1770,11 +1434,10 @@ function initSupabase() {
     const plans =
       getPlans();
 
-    if (
-      materials.length === 0
-    ) {
 
-      list.innerHTML = `
+    if (materials.length === 0) {
+
+      container.innerHTML = `
         <p class="empty">
           Noch kein Lernmaterial gespeichert.
         </p>
@@ -1783,68 +1446,47 @@ function initSupabase() {
       return;
     }
 
-    list.innerHTML = "";
+
+    container.innerHTML = "";
+
 
     materials.forEach(material => {
 
       const plan =
         plans.find(
-          p =>
-            p.id === material.planId
+          item => item.id === material.planId
         );
 
-      const files =
-        Array.isArray(
-          material.files
-        )
-          ? material.files
-          : [];
 
-      list.innerHTML += `
+      container.innerHTML += `
 
         <div class="material">
 
           <h3>
-            📚 ${
-              plan
-              ? escapeHtml(
-                  plan.subject
-                )
-              : "Unbekannter Lernplan"
-            }
+            ${escapeHtml(
+              plan ? plan.subject : "Unbekannter Lernplan"
+            )}
           </h3>
 
-          <p class="small">
-            Gespeichert:
-            ${new Date(
-              material.createdAt
-            ).toLocaleDateString(
-              "de-DE"
-            )}
-          </p>
-
-          ${
-            files.length
-              ? `
-                <p>
-                  📎 Dateien:
-                  ${files
-                    .map(
-                      file =>
-                        escapeHtml(file)
-                    )
-                    .join(", ")}
-                </p>
-              `
-              : ""
-          }
 
           ${
             material.text
               ? `
                 <p>
-                  📝 ${escapeHtml(
-                    material.text
+                  ${escapeHtml(material.text)}
+                </p>
+              `
+              : ""
+          }
+
+
+          ${
+            material.files &&
+            material.files.length
+              ? `
+                <p class="small">
+                  📎 ${escapeHtml(
+                    material.files.join(", ")
                   )}
                 </p>
               `
@@ -1854,7 +1496,232 @@ function initSupabase() {
         </div>
 
       `;
+
     });
+
+  }
+
+
+  /* ==========================================
+     KI KARTEIKARTEN
+  ========================================== */
+
+  async function createCardsFromMaterial() {
+
+    const planId =
+      Number(
+        document.getElementById("materialPlan").value
+      );
+
+
+    const lerntext =
+      document
+        .getElementById("materialText")
+        .value
+        .trim();
+
+
+    const fileInput =
+      document.getElementById("materialFile");
+
+
+    if (!planId) {
+
+      document.getElementById(
+        "materialStatus"
+      ).textContent =
+        "⚠️ Bitte zuerst einen Lernplan auswählen.";
+
+      return;
+    }
+
+
+    if (!lerntext && fileInput.files.length === 0) {
+
+      document.getElementById(
+        "materialStatus"
+      ).textContent =
+        "⚠️ Bitte zuerst Lernmaterial hinzufügen.";
+
+      return;
+    }
+
+
+    const status =
+      document.getElementById(
+        "materialStatus"
+      );
+
+
+    status.textContent =
+      "🤖 KI erstellt deine Karteikarten...";
+
+
+    try {
+
+      const files = [];
+
+
+      for (const file of fileInput.files) {
+
+        const base64 =
+          await fileToBase64(file);
+
+
+        files.push({
+
+          mimeType:
+            file.type || "application/octet-stream",
+
+          data:
+            base64.split(",")[1]
+
+        });
+
+      }
+
+
+      const response =
+        await fetch(
+          SUPABASE_URL +
+          "/functions/v1/generare-flashcards",
+          {
+
+            method: "POST",
+
+            headers: {
+
+              "Content-Type":
+                "application/json"
+
+            },
+
+            body: JSON.stringify({
+
+              lerntext,
+
+              files
+
+            })
+
+          }
+        );
+
+
+      const result =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          result?.error ||
+          "Fehler bei der KI."
+        );
+
+      }
+
+
+      if (
+        !result.cards ||
+        !Array.isArray(result.cards)
+      ) {
+
+        throw new Error(
+          "Die KI hat keine Kartenliste geliefert."
+        );
+
+      }
+
+
+      const existingCards =
+        getCards();
+
+
+      result.cards.forEach(card => {
+
+        existingCards.push({
+
+          id:
+            Date.now() +
+            Math.random(),
+
+          planId,
+
+          question:
+            String(card.question),
+
+          answer:
+            String(card.answer),
+
+          level: 0,
+
+          learned: false,
+
+          failedToday: false,
+
+          firstFailedToday: false,
+
+          lastReviewDate: null,
+
+          nextReviewDate:
+            todayKey()
+
+        });
+
+      });
+
+
+      saveCards(existingCards);
+
+
+      status.textContent =
+        `✅ ${result.cards.length} Karteikarten erstellt.`;
+
+
+      renderCards();
+      updateOverview();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+
+      status.textContent =
+        "❌ Fehler: " +
+        (
+          error.message ||
+          "Karteikarten konnten nicht erstellt werden."
+        );
+
+    }
+
+  }
+
+
+  function fileToBase64(file) {
+
+    return new Promise(
+      (resolve, reject) => {
+
+        const reader =
+          new FileReader();
+
+
+        reader.onload =
+          () => resolve(reader.result);
+
+
+        reader.onerror =
+          reject;
+
+
+        reader.readAsDataURL(file);
+
+      }
+    );
+
   }
 
 
@@ -1862,73 +1729,74 @@ function initSupabase() {
      KARTEIKARTEN
   ========================================== */
 
-  function getCards() {
-
-    try {
-
-      return JSON.parse(
-        localStorage.getItem(
-          "learnpathCards"
-        )
-      ) || [];
-
-    } catch {
-
-      return [];
-    }
-  }
-
-
   function addCard() {
 
+    const planId =
+      Number(
+        document.getElementById(
+          "manualCardPlan"
+        ).value
+      );
+
+
     const question =
-      document.getElementById(
-        "cardQuestion"
-      ).value.trim();
+      document
+        .getElementById("cardQuestion")
+        .value
+        .trim();
+
 
     const answer =
-      document.getElementById(
-        "cardAnswer"
-      ).value.trim();
+      document
+        .getElementById("cardAnswer")
+        .value
+        .trim();
 
-    if (
-      !question ||
-      !answer
-    ) {
+
+    if (!planId || !question || !answer) {
 
       alert(
-        "Bitte Frage und Antwort eingeben."
+        "Bitte Lernplan, Frage und Antwort eingeben."
       );
 
       return;
     }
 
+
     const cards =
       getCards();
+
 
     cards.push({
 
       id:
-        Date.now(),
+        Date.now() +
+        Math.random(),
 
-      question:
-        question,
+      planId,
 
-      answer:
-        answer,
+      question,
 
-      level:
-        0,
+      answer,
 
-      learned:
-        false
+      level: 0,
+
+      learned: false,
+
+      failedToday: false,
+
+      firstFailedToday: false,
+
+      lastReviewDate: null,
+
+      nextReviewDate:
+        todayKey()
 
     });
 
-    localStorage.setItem(
-      "learnpathCards",
-      JSON.stringify(cards)
-    );
+
+    saveCards(cards);
+
 
     document.getElementById(
       "cardQuestion"
@@ -1938,111 +1806,106 @@ function initSupabase() {
       "cardAnswer"
     ).value = "";
 
+
     renderCards();
     updateOverview();
+
   }
 
 
   function renderCards() {
 
-    const list =
-      document.getElementById(
-        "cardList"
-      );
+    const container =
+      document.getElementById("cardList");
 
-    if (!list) {
-      return;
-    }
+    if (!container) return;
+
 
     const cards =
       getCards();
 
-    if (
-      cards.length === 0
-    ) {
 
-      list.innerHTML = `
+    const plans =
+      getPlans();
 
+
+    if (cards.length === 0) {
+
+      container.innerHTML = `
         <p class="empty">
-
-          Noch keine Karteikarten.
-
-          <br><br>
-
-          📷 Lade zuerst Lernmaterial hoch
-          und erstelle daraus Karteikarten.
-
+          Noch keine Karteikarten vorhanden.
         </p>
-
       `;
 
       return;
     }
 
-    list.innerHTML = "";
 
-    cards.forEach(
-      (card, index) => {
+    container.innerHTML = "";
 
-        list.innerHTML += `
 
-          <div class="flashcard">
+    cards.forEach(card => {
 
-            <h3>
-              Karte ${index + 1}
-            </h3>
+      const plan =
+        plans.find(
+          item => item.id === card.planId
+        );
+
+
+      container.innerHTML += `
+
+        <div class="flashcard">
+
+          <p class="small">
+            ${
+              plan
+                ? escapeHtml(plan.subject)
+                : "Ohne Lernplan"
+            }
+          </p>
+
+
+          <h3>
+            ❓ ${escapeHtml(card.question)}
+          </h3>
+
+
+          <button
+            class="secondary"
+            onclick="toggleAnswer(${card.id})"
+          >
+            Antwort anzeigen
+          </button>
+
+
+          <div
+            id="answer-${card.id}"
+            class="learning-answer"
+          >
+            <strong>Antwort:</strong>
 
             <p>
-              <strong>Frage:</strong>
+              ${escapeHtml(card.answer)}
             </p>
-
-            <p>
-              ${escapeHtml(
-                card.question
-              )}
-            </p>
-
-            <button
-              class="secondary"
-              onclick="toggleAnswer(${card.id})"
-            >
-              Antwort anzeigen
-            </button>
-
-            <div
-              id="answer-${card.id}"
-              class="flashcard-answer"
-            >
-
-              <strong>Antwort:</strong>
-
-              <p>
-                ${escapeHtml(
-                  card.answer
-                )}
-              </p>
-
-              <button
-                class="secondary"
-                onclick="cardKnown(${card.id})"
-              >
-                ✅ Gewusst
-              </button>
-
-              <button
-                class="secondary"
-                onclick="cardUnknown(${card.id})"
-              >
-                🔄 Noch einmal
-              </button>
-
-            </div>
-
           </div>
 
-        `;
-      }
-    );
+
+          <p class="small">
+            Level: ${card.level || 0}
+            ${
+              card.nextReviewDate
+                ? " · Nächste Wiederholung: " +
+                  formatDate(card.nextReviewDate)
+                : ""
+            }
+          </p>
+
+        </div>
+
+      `;
+
+    });
+
   }
 
 
@@ -2053,90 +1916,628 @@ function initSupabase() {
         "answer-" + id
       );
 
-    if (!answer) {
-      return;
-    }
+
+    if (!answer) return;
+
 
     if (
       answer.style.display === "block"
     ) {
 
-      answer.style.display =
-        "none";
+      answer.style.display = "none";
 
     } else {
 
-      answer.style.display =
-        "block";
+      answer.style.display = "block";
+
     }
+
   }
 
 
-  function cardKnown(id) {
+  /* ==========================================
+     LERNMODUS
+  ========================================== */
 
-    const cards =
-      getCards();
+  let learningSession = {
 
-    const card =
-      cards.find(
-        card =>
-          card.id === id
+    planId: null,
+
+    queue: [],
+
+    currentIndex: 0,
+
+    initialFailedIds: new Set(),
+
+    repeatedIds: new Set(),
+
+    answeredCurrent: false
+
+  };
+
+
+  function getTodayCardsForPlan(planId) {
+
+    const today =
+      todayKey();
+
+
+    return getCards()
+      .filter(card => {
+
+        if (card.planId !== planId) {
+          return false;
+        }
+
+
+        if (!card.nextReviewDate) {
+          return true;
+        }
+
+
+        return card.nextReviewDate <= today;
+
+      });
+
+  }
+
+
+  function startLearningSession() {
+
+    const planId =
+      Number(
+        localStorage.getItem(
+          "learnpathCurrentPlan"
+        )
       );
 
-    if (!card) {
+
+    if (!planId) {
+
+      document.getElementById(
+        "learningHeader"
+      ).innerHTML = `
+        <h2>📖 Lernen</h2>
+      `;
+
+
+      document.getElementById(
+        "learningArea"
+      ).innerHTML = `
+        <div class="warning">
+          Bitte zuerst einen Lernplan auswählen.
+        </div>
+      `;
+
       return;
     }
 
-    card.level =
-      Math.min(
-        (card.level || 0) + 1,
-        5
+
+    const plan =
+      getPlans().find(
+        item => item.id === planId
       );
 
-    card.learned =
+
+    if (!plan) {
+
+      document.getElementById(
+        "learningArea"
+      ).innerHTML = `
+        <div class="warning">
+          Lernplan wurde nicht gefunden.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    const cards =
+      getTodayCardsForPlan(planId);
+
+
+    learningSession = {
+
+      planId,
+
+      queue:
+        cards.map(card => ({ ...card })),
+
+      currentIndex: 0,
+
+      initialFailedIds:
+        new Set(),
+
+      repeatedIds:
+        new Set(),
+
+      answeredCurrent: false
+
+    };
+
+
+    document.getElementById(
+      "learningHeader"
+    ).innerHTML = `
+
+      <h2>
+        📖 Lernen: ${escapeHtml(plan.subject)}
+      </h2>
+
+      <p class="small">
+        Heute sind nur die fälligen Karteikarten dran.
+      </p>
+
+    `;
+
+
+    renderLearningSession();
+
+  }
+
+
+  function renderLearningSession() {
+
+    const progress =
+      document.getElementById(
+        "learningProgress"
+      );
+
+
+    const area =
+      document.getElementById(
+        "learningArea"
+      );
+
+
+    const total =
+      learningSession.queue.length;
+
+
+    const current =
+      learningSession.currentIndex;
+
+
+    if (total === 0) {
+
+      progress.innerHTML = "";
+
+      area.innerHTML = `
+
+        <div class="center">
+
+          <div class="info">
+
+            <h3>
+              🎉 Für heute bist du fertig!
+            </h3>
+
+            <p style="margin-top:10px;">
+              Es sind aktuell keine weiteren
+              Karteikarten fällig.
+            </p>
+
+          </div>
+
+
+          <button
+            class="primary"
+            onclick="showPage('plans')"
+          >
+            Zurück zu den Lernplänen
+          </button>
+
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    if (current >= total) {
+
+      finishLearningSession();
+
+      return;
+    }
+
+
+    const percent =
+      Math.round(
+        (current / total) * 100
+      );
+
+
+    progress.innerHTML = `
+
+      <p class="small">
+        Karte ${current + 1}
+        von ${total}
+      </p>
+
+      <div class="progress-bar">
+
+        <div
+          class="progress-fill"
+          style="width:${percent}%"
+        ></div>
+
+      </div>
+
+    `;
+
+
+    const card =
+      learningSession.queue[current];
+
+
+    area.innerHTML = `
+
+      <div class="flashcard learning-card">
+
+        <p class="small">
+          Frage
+        </p>
+
+
+        <div class="learning-question">
+
+          ${escapeHtml(card.question)}
+
+        </div>
+
+
+        <div
+          id="learningAnswer"
+          class="learning-answer"
+        >
+
+          <strong>Antwort</strong>
+
+          <p style="margin-top:10px;">
+            ${escapeHtml(card.answer)}
+          </p>
+
+        </div>
+
+
+        ${
+          learningSession.answeredCurrent
+            ? `
+              <div class="learning-actions">
+
+                <button
+                  class="primary"
+                  onclick="answerLearningCard(true)"
+                >
+                  ✅ Konnte ich
+                </button>
+
+
+                <button
+                  class="secondary"
+                  onclick="answerLearningCard(false)"
+                >
+                  ❌ Konnte ich nicht
+                </button>
+
+              </div>
+            `
+            : `
+              <button
+                class="primary"
+                onclick="showLearningAnswer()"
+              >
+                👁️ Antwort anzeigen
+              </button>
+            `
+        }
+
+      </div>
+
+    `;
+
+
+    if (learningSession.answeredCurrent) {
+
+      document.getElementById(
+        "learningAnswer"
+      ).style.display = "block";
+
+    }
+
+  }
+
+
+  function showLearningAnswer() {
+
+    const answer =
+      document.getElementById(
+        "learningAnswer"
+      );
+
+
+    if (!answer) return;
+
+
+    answer.style.display =
+      "block";
+
+
+    learningSession.answeredCurrent =
       true;
 
-    localStorage.setItem(
-      "learnpathCards",
-      JSON.stringify(cards)
-    );
 
-    renderCards();
-    updateOverview();
+    renderLearningSession();
+
   }
 
 
-  function cardUnknown(id) {
+  function answerLearningCard(knewIt) {
+
+    const card =
+      learningSession.queue[
+        learningSession.currentIndex
+      ];
+
+
+    if (!card) return;
+
 
     const cards =
       getCards();
 
-    const card =
+
+    const storedCard =
       cards.find(
-        card =>
-          card.id === id
+        item => item.id === card.id
       );
 
-    if (!card) {
-      return;
+
+    if (!storedCard) return;
+
+
+    if (!knewIt) {
+
+      /*
+        Der erste Fehlversuch wird dauerhaft
+        für morgen markiert.
+
+        Zusätzlich kommt die Karte ans Ende
+        der heutigen Sitzung.
+      */
+
+      storedCard.failedToday =
+        true;
+
+      storedCard.firstFailedToday =
+        true;
+
+      storedCard.learned =
+        false;
+
+      storedCard.lastReviewDate =
+        todayKey();
+
+      storedCard.nextReviewDate =
+        addDaysKey(1);
+
+
+      learningSession.initialFailedIds
+        .add(storedCard.id);
+
+
+      if (
+        !learningSession.repeatedIds
+          .has(storedCard.id)
+      ) {
+
+        learningSession.queue.push(
+          storedCard
+        );
+
+        learningSession.repeatedIds
+          .add(storedCard.id);
+
+      }
+
+    } else {
+
+      storedCard.level =
+        Math.min(
+          (storedCard.level || 0) + 1,
+          5
+        );
+
+
+      storedCard.learned =
+        true;
+
+
+      storedCard.lastReviewDate =
+        todayKey();
+
+
+      /*
+        Wenn die Karte vorher heute schon
+        einmal falsch war, bleibt sie trotzdem
+        für morgen vorgemerkt.
+      */
+
+      if (
+        learningSession.initialFailedIds
+          .has(storedCard.id)
+      ) {
+
+        storedCard.nextReviewDate =
+          addDaysKey(1);
+
+      } else {
+
+        scheduleKnownCard(
+          storedCard
+        );
+
+      }
+
     }
 
-    card.level =
-      Math.max(
-        (card.level || 0) - 1,
-        0
-      );
 
-    card.learned =
-      false;
+    saveCards(cards);
 
-    localStorage.setItem(
-      "learnpathCards",
-      JSON.stringify(cards)
+
+    updatePlanCardStats(
+      storedCard.planId
     );
 
-    renderCards();
+
+    learningSession.currentIndex++;
+
+    learningSession.answeredCurrent =
+      false;
+
+
+    renderLearningSession();
+
     updateOverview();
+
+  }
+
+
+  function scheduleKnownCard(card) {
+
+    if (card.level <= 1) {
+
+      card.nextReviewDate =
+        addDaysKey(1);
+
+    } else if (card.level === 2) {
+
+      card.nextReviewDate =
+        addDaysKey(2);
+
+    } else if (card.level === 3) {
+
+      card.nextReviewDate =
+        addDaysKey(4);
+
+    } else if (card.level === 4) {
+
+      card.nextReviewDate =
+        addDaysKey(7);
+
+    } else {
+
+      card.nextReviewDate =
+        addDaysKey(14);
+
+    }
+
+  }
+
+
+  function updatePlanCardStats(planId) {
+
+    const cards =
+      getCards()
+        .filter(
+          card => card.planId === planId
+        );
+
+    return cards.length;
+
+  }
+
+
+  function finishLearningSession() {
+
+    const plan =
+      getPlans().find(
+        plan =>
+          plan.id ===
+          learningSession.planId
+      );
+
+
+    const repeatedCount =
+      learningSession.repeatedIds.size;
+
+
+    document.getElementById(
+      "learningProgress"
+    ).innerHTML = "";
+
+
+    document.getElementById(
+      "learningArea"
+    ).innerHTML = `
+
+      <div class="center">
+
+        <div class="info">
+
+          <h3>
+            🎉 Lerneinheit abgeschlossen!
+          </h3>
+
+
+          <p style="margin-top:10px;">
+
+            Du hast alle heute geplanten Karten
+            für
+
+            <strong>
+              ${escapeHtml(
+                plan
+                  ? plan.subject
+                  : ""
+              )}
+            </strong>
+
+            bearbeitet.
+
+          </p>
+
+
+          ${
+            repeatedCount > 0
+              ? `
+                <p style="margin-top:10px;">
+                  🔄 ${repeatedCount}
+                  Karte(n) wurden heute wiederholt.
+                </p>
+              `
+              : ""
+          }
+
+
+          <p
+            class="small"
+            style="margin-top:10px;"
+          >
+
+            Karten, die heute mindestens einmal
+            nicht gewusst wurden, sind trotzdem
+            für morgen vorgemerkt.
+
+          </p>
+
+        </div>
+
+
+        <button
+          class="primary"
+          onclick="showPage('plans')"
+        >
+          Zurück zu den Lernplänen
+        </button>
+
+      </div>
+
+    `;
+
   }
 
 
@@ -2144,11 +2545,9 @@ function initSupabase() {
      PROBEPRÜFUNG
   ========================================== */
 
-  let testInterval =
-    null;
+  let testInterval = null;
 
-  let testSeconds =
-    0;
+  let testSeconds = 0;
 
 
   function startTest() {
@@ -2160,55 +2559,56 @@ function initSupabase() {
         ).value
       );
 
+
     testSeconds =
       duration * 60;
 
+
     document.getElementById(
       "testSetup"
-    ).classList.add(
-      "hidden"
-    );
+    ).classList.add("hidden");
+
 
     document.getElementById(
       "testArea"
-    ).classList.remove(
-      "hidden"
-    );
+    ).classList.remove("hidden");
+
 
     document.getElementById(
       "testResult"
     ).innerHTML = "";
 
+
     createPracticeQuestions();
 
     updateTimer();
+
 
     clearInterval(
       testInterval
     );
 
+
     testInterval =
-      setInterval(
-        () => {
+      setInterval(() => {
 
-          testSeconds--;
+        testSeconds--;
 
-          updateTimer();
+        updateTimer();
 
-          if (
-            testSeconds <= 0
-          ) {
 
-            clearInterval(
-              testInterval
-            );
+        if (testSeconds <= 0) {
 
-            finishTest();
-          }
+          clearInterval(
+            testInterval
+          );
 
-        },
-        1000
-      );
+          finishTest();
+
+        }
+
+      }, 1000);
+
   }
 
 
@@ -2219,25 +2619,23 @@ function initSupabase() {
         testSeconds / 60
       );
 
+
     const seconds =
       testSeconds % 60;
+
 
     document.getElementById(
       "timer"
     ).textContent =
-      String(
-        minutes
-      ).padStart(
-        2,
-        "0"
-      ) +
+
+      String(minutes)
+        .padStart(2, "0") +
+
       ":" +
-      String(
-        seconds
-      ).padStart(
-        2,
-        "0"
-      );
+
+      String(seconds)
+        .padStart(2, "0");
+
   }
 
 
@@ -2246,27 +2644,19 @@ function initSupabase() {
     const cards =
       getCards();
 
+
     const container =
       document.getElementById(
         "testQuestions"
       );
 
-    if (
-      cards.length === 0
-    ) {
+
+    if (cards.length === 0) {
 
       container.innerHTML = `
 
         <div class="warning">
-
-          ⚠️ Es gibt noch keine
-          Karteikarten.
-
-          <br><br>
-
-          Lade zuerst Lernmaterial hoch
-          und erstelle Karteikarten.
-
+          ⚠️ Es gibt noch keine Karteikarten.
         </div>
 
       `;
@@ -2274,16 +2664,16 @@ function initSupabase() {
       return;
     }
 
+
     const questions =
       cards.slice(
         0,
-        Math.min(
-          cards.length,
-          10
-        )
+        Math.min(cards.length, 10)
       );
 
+
     container.innerHTML = "";
+
 
     questions.forEach(
       (card, index) => {
@@ -2302,6 +2692,7 @@ function initSupabase() {
               )}
             </p>
 
+
             <textarea
               id="testAnswer-${card.id}"
               placeholder="Deine Antwort..."
@@ -2310,8 +2701,10 @@ function initSupabase() {
           </div>
 
         `;
+
       }
     );
+
   }
 
 
@@ -2321,60 +2714,64 @@ function initSupabase() {
       testInterval
     );
 
+
     const cards =
       getCards();
+
 
     const questions =
       cards.slice(
         0,
-        Math.min(
-          cards.length,
-          10
-        )
+        Math.min(cards.length, 10)
       );
 
-    if (
-      questions.length === 0
-    ) {
+
+    if (questions.length === 0) {
 
       resetTest();
 
       return;
     }
 
-    let answered =
-      0;
 
-    questions.forEach(card => {
+    let answered = 0;
 
-      const input =
-        document.getElementById(
-          "testAnswer-" +
-          card.id
-        );
 
-      if (
-        input &&
-        input.value.trim()
-      ) {
+    questions.forEach(
+      card => {
 
-        answered++;
+        const input =
+          document.getElementById(
+            "testAnswer-" +
+            card.id
+          );
+
+
+        if (
+          input &&
+          input.value.trim()
+        ) {
+
+          answered++;
+
+        }
+
       }
-    });
+    );
+
 
     const percent =
       Math.round(
-        (
-          answered /
-          questions.length
-        ) * 100
+        (answered /
+          questions.length) *
+        100
       );
+
 
     document.getElementById(
       "testArea"
-    ).classList.add(
-      "hidden"
-    );
+    ).classList.add("hidden");
+
 
     document.getElementById(
       "testResult"
@@ -2386,32 +2783,32 @@ function initSupabase() {
           🏁 Probeprüfung beendet
         </h3>
 
+
         <p>
           Du hast
-          <strong>
-            ${answered}
-          </strong>
+          <strong>${answered}</strong>
           von
-          <strong>
-            ${questions.length}
-          </strong>
+          <strong>${questions.length}</strong>
           Fragen beantwortet.
         </p>
 
+
         <p>
           Bearbeitungsquote:
-          <strong>
-            ${percent}%
-          </strong>
+          <strong>${percent}%</strong>
         </p>
 
+
         <p class="small">
-          Die automatische Bewertung
-          deiner Antworten wird später
-          durch die KI ergänzt.
+
+          Die automatische Bewertung deiner
+          Antworten wird später durch die KI
+          ergänzt.
+
         </p>
 
       </div>
+
 
       <button
         class="primary"
@@ -2422,6 +2819,7 @@ function initSupabase() {
 
     `;
 
+
     const tests =
       Number(
         localStorage.getItem(
@@ -2429,14 +2827,15 @@ function initSupabase() {
         )
       ) || 0;
 
+
     localStorage.setItem(
       "learnpathTests",
-      String(
-        tests + 1
-      )
+      String(tests + 1)
     );
 
+
     updateOverview();
+
   }
 
 
@@ -2446,25 +2845,137 @@ function initSupabase() {
       testInterval
     );
 
+
     document.getElementById(
       "testArea"
-    ).classList.add(
-      "hidden"
-    );
+    ).classList.add("hidden");
+
 
     document.getElementById(
       "testSetup"
-    ).classList.remove(
-      "hidden"
-    );
+    ).classList.remove("hidden");
+
 
     document.getElementById(
       "testResult"
     ).innerHTML = "";
 
+
     document.getElementById(
       "testQuestions"
     ).innerHTML = "";
+
+  }
+
+
+  /* ==========================================
+     PROFIL
+  ========================================== */
+
+  function saveProfile() {
+
+    const profile = {
+
+      name:
+        document
+          .getElementById(
+            "profileName"
+          )
+          .value
+          .trim(),
+
+      state:
+        document
+          .getElementById(
+            "profileState"
+          )
+          .value,
+
+      school:
+        document
+          .getElementById(
+            "profileSchool"
+          )
+          .value,
+
+      grade:
+        document
+          .getElementById(
+            "profileGrade"
+          )
+          .value
+
+    };
+
+
+    localStorage.setItem(
+      "learnpathProfile",
+      JSON.stringify(profile)
+    );
+
+
+    document.getElementById(
+      "profileStatus"
+    ).textContent =
+      "✅ Profil gespeichert.";
+
+  }
+
+
+  function loadProfile() {
+
+    const profile =
+      JSON.parse(
+        localStorage.getItem(
+          "learnpathProfile"
+        ) || "{}"
+      );
+
+
+    const name =
+      document.getElementById(
+        "profileName"
+      );
+
+    const state =
+      document.getElementById(
+        "profileState"
+      );
+
+    const school =
+      document.getElementById(
+        "profileSchool"
+      );
+
+    const grade =
+      document.getElementById(
+        "profileGrade"
+      );
+
+
+    if (name) {
+      name.value =
+        profile.name || "";
+    }
+
+
+    if (state) {
+      state.value =
+        profile.state || "";
+    }
+
+
+    if (school) {
+      school.value =
+        profile.school || "";
+    }
+
+
+    if (grade) {
+      grade.value =
+        profile.grade || "";
+    }
+
   }
 
 
@@ -2477,14 +2988,16 @@ function initSupabase() {
     const plans =
       getPlans();
 
+
     const cards =
       getCards();
 
+
     const learned =
       cards.filter(
-        card =>
-          card.learned
+        card => card.learned
       ).length;
+
 
     const tests =
       Number(
@@ -2493,47 +3006,50 @@ function initSupabase() {
         )
       ) || 0;
 
+
     document.getElementById(
       "statPlans"
     ).textContent =
       plans.length;
+
 
     document.getElementById(
       "statCards"
     ).textContent =
       cards.length;
 
+
     document.getElementById(
       "statLearned"
     ).textContent =
       learned;
+
 
     document.getElementById(
       "statTests"
     ).textContent =
       tests;
 
+
     const today =
       document.getElementById(
         "todayPlan"
       );
 
-    if (
-      plans.length === 0
-    ) {
 
-      today.innerHTML = `
+    if (plans.length === 0) {
 
-        <p class="empty">
+      today.innerHTML =
+        `<p class="empty">
           Noch kein Lernplan vorhanden.
-        </p>
-
-      `;
+        </p>`;
 
       return;
     }
 
+
     today.innerHTML = "";
+
 
     plans.forEach(plan => {
 
@@ -2542,27 +3058,29 @@ function initSupabase() {
           plan.examDate
         );
 
-      let recommendation;
 
-      if (
-        days <= 4
-      ) {
+      const todayCount =
+        getTodayCardsForPlan(
+          plan.id
+        ).length;
+
+
+      let recommendation =
+        "📚 Regelmäßig lernen";
+
+
+      if (days <= 4) {
 
         recommendation =
           "🚨 Prüfung steht kurz bevor!";
 
-      } else if (
-        days <= 7
-      ) {
+      } else if (days <= 7) {
 
         recommendation =
           "🔥 Endspurt";
 
-      } else {
-
-        recommendation =
-          "📚 Regelmäßig lernen";
       }
+
 
       today.innerHTML += `
 
@@ -2574,6 +3092,7 @@ function initSupabase() {
             )}
           </h3>
 
+
           <p>
             📅 Prüfung:
             ${formatDate(
@@ -2581,17 +3100,32 @@ function initSupabase() {
             )}
           </p>
 
+
           <p>
             ⏳ ${
               days > 0
-                ? days + " Tage verbleiben"
+                ? days +
+                  " Tage verbleiben"
                 : "Prüfung ist vorbei"
             }
           </p>
 
+
           <p>
             ${recommendation}
           </p>
+
+
+          <p
+            style="margin-top:8px;"
+          >
+            📖 Heute fällig:
+            <strong>
+              ${todayCount}
+            </strong>
+            Karte(n)
+          </p>
+
 
           ${
             days === 4
@@ -2605,62 +3139,164 @@ function initSupabase() {
               : ""
           }
 
+
+          <button
+            class="primary"
+            onclick="selectPlan(${plan.id})"
+            style="margin-top:12px;"
+          >
+            📖 Jetzt lernen
+          </button>
+
         </div>
 
       `;
+
     });
+
   }
 
 
   /* ==========================================
-     HILFSFUNKTIONEN
+     DATUM / HILFSFUNKTIONEN
   ========================================== */
+
+  function todayKey() {
+
+    const date =
+      new Date();
+
+
+    const year =
+      date.getFullYear();
+
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(2, "0");
+
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(2, "0");
+
+
+    return (
+      year +
+      "-" +
+      month +
+      "-" +
+      day
+    );
+
+  }
+
+
+  function addDaysKey(days) {
+
+    const date =
+      new Date();
+
+
+    date.setHours(
+      0,
+      0,
+      0,
+      0
+    );
+
+
+    date.setDate(
+      date.getDate() + days
+    );
+
+
+    const year =
+      date.getFullYear();
+
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(2, "0");
+
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(2, "0");
+
+
+    return (
+      year +
+      "-" +
+      month +
+      "-" +
+      day
+    );
+
+  }
+
 
   function formatDate(date) {
 
     return new Date(
-      date + "T00:00:00"
+      date +
+      "T00:00:00"
     ).toLocaleDateString(
       "de-DE"
     );
+
   }
 
 
   function escapeHtml(value) {
 
     return String(value)
+
       .replaceAll(
         "&",
         "&amp;"
       )
+
       .replaceAll(
         "<",
         "&lt;"
       )
+
       .replaceAll(
         ">",
         "&gt;"
       )
+
       .replaceAll(
         '"',
         "&quot;"
       )
+
       .replaceAll(
         "'",
         "&#039;"
       );
+
   }
 
 
   /* ==========================================
      START
   ========================================== */
-initSupabase();
+
+  initSupabase();
+
   loadProfile();
 
   renderPlans();
 
   renderMaterialPlans();
+
+  renderManualCardPlans();
 
   renderMaterials();
 
