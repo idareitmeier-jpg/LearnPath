@@ -1546,27 +1546,43 @@ function initSupabase() {
 
         existingCards.push({
 
-          id:
-            Date.now() +
-            Math.random(),
+  id:
+    Date.now() +
+    Math.random(),
 
-          question:
-            String(
-              card.question
-            ),
+  planId:
+    Number(
+      document.getElementById(
+        "materialPlan"
+      ).value
+    ),
 
-          answer:
-            String(
-              card.answer
-            ),
+  question:
+    String(
+      card.question
+    ),
 
-          level:
-            0,
+  answer:
+    String(
+      card.answer
+    ),
 
-          learned:
-            false
+  level:
+    0,
 
-        });
+  learned:
+    false,
+
+  failedToday:
+    false,
+
+  firstFailedToday:
+    false,
+
+  lastReviewDate:
+    null
+
+});
       });
 
       localStorage.setItem(
